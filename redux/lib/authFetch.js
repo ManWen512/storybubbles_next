@@ -2,8 +2,8 @@
 
 export const authFetch = async (url, options = {}) => {
     // 🔐 Hardcoded username and password
-    const username = 'abcdefg';
-    const password = 'hijklmnop';
+    const username = process.env.NEXT_PUBLIC_USERNAME;
+    const password = process.env.NEXT_PUBLIC_PASSWORD;
     const token = btoa(`${username}:${password}`);
   
     const res = await fetch(url, {
