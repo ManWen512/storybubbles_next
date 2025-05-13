@@ -1,4 +1,13 @@
-@import "tailwindcss";
+
+@font-face {
+  font-family: 'Bjola';
+  src: url('/fonts/Bjola.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
