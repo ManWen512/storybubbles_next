@@ -39,9 +39,7 @@ export default function PreTest() {
     }
 
     // Find unanswered question IDs
-    const missing = preTest
-      .filter((q) => !answers[q.id])
-      .map((q) => q.id);
+    const missing = preTest.filter((q) => !answers[q.id]).map((q) => q.id);
 
     if (missing.length > 0) {
       setUnanswered(missing);
@@ -58,18 +56,28 @@ export default function PreTest() {
       });
   };
 
-  if (status === "loading") return <p className="text-center">Loading...</p>;
+  if (status === "loading")
+    return (
+      <div className="flex items-center justify-center">
+        <img src="/animation.gif" />
+      </div>
+    );
   if (status === "failed")
-    return <p className="text-center text-red-500">Failed to load questions.</p>;
+    return (
+      <p className="text-center text-red-500">Failed to load questions.</p>
+    );
 
   return (
     <div className="max-w-3xl mx-auto p-4">
-      <h1 className="text-2xl font-bjola font-bold mb-6">Game Feedback Form</h1>
+      <h1 className="text-2xl font-quicksand font-bold mb-6">
+        Game Feedback Form
+      </h1>
+
       <form onSubmit={handleSubmit}>
         {preTest.map((q) => (
           <div key={q.id} className="mb-6">
             <h2
-              className={`text-lg font-bjola mb-2 ${
+              className={`text-lg font-quicksand mb-2 ${
                 unanswered.includes(q.id) ? "text-red-500" : ""
               }`}
             >
@@ -77,7 +85,9 @@ export default function PreTest() {
             </h2>
             <div
               className={`grid grid-cols-5 gap-1 place-items-center ${
-                unanswered.includes(q.id) ? "border-2 border-red-400 p-2 rounded-lg" : ""
+                unanswered.includes(q.id)
+                  ? "border-2 border-red-400 p-2 rounded-lg"
+                  : ""
               }`}
             >
               {q.choices.map((choice, index) => (
@@ -105,7 +115,7 @@ export default function PreTest() {
                         height="48"
                       />
                     </span>
-                    <span className="text-xs font-bjola text-center">
+                    <span className="text-xs font-quicksand text-center">
                       {choice.label}
                     </span>
                   </div>

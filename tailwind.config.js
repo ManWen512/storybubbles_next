@@ -8,6 +8,7 @@ module.exports = {
         extend: {
             fontFamily: {
               bjola: ['Bjola', 'sans-serif'],
+              quicksand: ['Quicksand', 'sans-serif'],
             },
           },
     },

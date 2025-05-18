@@ -9,7 +9,7 @@ const QuestionBox = ({ question, onAnswered }) => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md mt-4">
-      <h2 className="text-lg font-bjola mb-2">{question.questionText}</h2>
+      <h2 className="text-lg font-quicksand mb-2">{question.questionText}</h2>
       <div className="grid grid-cols-2 gap-2">
         {question.choices.map((choice, index) => (
           <button

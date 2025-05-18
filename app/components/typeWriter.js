@@ -23,7 +23,7 @@ const TypewriterDialogueBox = ({ text, speed = 50, onComplete }) => {
   }, [index, text, speed, onComplete]);
 
   return (
-    <div className="bg-white text-black p-4 rounded  sm:w-screen  max-w-xl mx-auto shadow-md font-mono">
+    <div className="bg-white text-black p-4 rounded  sm:w-screen  max-w-xl mx-auto shadow-md font-quicksand">
       <p>{displayedText}<span className="animate-pulse">|</span></p>
     </div>
   );
