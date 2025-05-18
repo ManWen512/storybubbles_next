@@ -31,13 +31,18 @@ export default function ProfilePage() {
     dispatch(createUser({ username, profileImage: selectedImageUrl }))
       .unwrap()
       .then((data) => {
-        alert("User created successfully!");
+       // Store user ID in local storage
+       if (data && data.id) {
+        localStorage.setItem('userId', data.id);
+      }
+      alert("User created successfully!");
+      router.push("/preTest");
       })
       .catch((err) => {
         alert("Failed to create user: " + err);
       });
 
-      router.push("/preTest");
+      
   };
 
   return (

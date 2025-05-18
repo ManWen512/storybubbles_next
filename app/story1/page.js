@@ -1,44 +1,147 @@
 'use client';
-import { useState } from 'react';
+
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchStory } from '@/redux/slices/storySlice';
 import TypewriterDialogueBox from '../components/typeWriter';
+import QuestionBox from '../components/questionBox';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function storyOne() {
-  const [step, setStep] = useState(0);
-  const [fadeOut, setFadeOut] = useState(false);
-  const [finished, setFinished] = useState(false);
+const StoryPlayer = () => {
+  const dispatch = useDispatch();
+  const { storyOne, status } = useSelector((state) => state.story);
 
-  const dialogues = [
-    "Once upon a time in a village near the Irrawaddy River...",
-    "A curious little boy named Ko Ko found a mysterious book.",
-    "As he opened it, the world around him began to shimmer and twist!",
-    "(Sammy flipped open the book… but suddenly, a golden light swirled around them! The pages glowed, and before they could say another word—WHOOSH!—they were sucked into the book!)"
-  ];
+  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
+  const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
+  const [showNextDialogue, setShowNextDialogue] = useState(true);
+  const [showQuestion, setShowQuestion] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const handleComplete = () => {
-    // If there are more lines, go to the next one
-    if (step < dialogues.length - 1) {
-      setTimeout(() => setStep(prev => prev + 1), 1500);
+  useEffect(() => {
+    dispatch(fetchStory(1)); // Fetch storyOne on mount
+  }, [dispatch]);
+
+  if (status === 'loading') return <p>Loading...</p>;
+  if (!storyOne?.scenes || storyOne.scenes.length === 0)
+    return <p>No story data available.</p>;
+
+  const scenes = storyOne.scenes;
+  const currentScene = scenes[currentSceneIndex];
+  const currentDialogue = currentScene.dialogues[currentDialogueIndex];
+  const currentImage = currentScene.pictures[0];
+  const questions = currentScene.questions || [];
+  const currentQuestion = questions[currentQuestionIndex];
+
+  const handleDialogueComplete = () => {
+    setShowNextDialogue(false);
+    setTimeout(() => {
+      if (currentDialogueIndex + 1 < currentScene.dialogues.length) {
+        setCurrentDialogueIndex((prev) => prev + 1);
+        setShowNextDialogue(true);
+      } else {
+        // All dialogues finished
+        if (questions.length > 0) {
+          setShowQuestion(true);
+        } else {
+          goToNextScene();
+        }
+      }
+    }, 1000);
+  };
+
+  const handleQuestionAnswered = () => {
+    if (currentQuestionIndex + 1 < questions.length) {
+      setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      // After final line finishes typing, wait a bit, then fade out
-      setTimeout(() => {
-        setFadeOut(true); // trigger fade out
-        setTimeout(() => setFinished(true), 1000); // remove from DOM after fade
-      }, 2000); // 2s pause before fade
+      setShowQuestion(false);
+      goToNextScene();
+    }
+  };
+
+  const goToNextScene = () => {
+    if (currentSceneIndex + 1 < scenes.length) {
+      setCurrentSceneIndex((prev) => prev + 1);
+      setCurrentDialogueIndex(0);
+      setCurrentQuestionIndex(0);
+      setShowNextDialogue(true);
+    } else {
+      // End of story
+      console.log('Story completed!');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-300 flex items-center justify-center px-4">
-      {!finished && (
-        <div className={`transition-opacity duration-1000  ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-          <TypewriterDialogueBox
-            key={step}
-            text={dialogues[step]}
-            speed={60}
-            onComplete={handleComplete}
+    <div className="min-h-screen bg-gradient-to-b from-sky-200 to-white grid grid-rows-[auto_auto_1fr] items-center justify-items-center p-4 gap-4">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSceneIndex}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -40 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-3xl grid grid-rows-[auto_auto_1fr] items-center justify-items-center gap-4"
+        >
+          {/* Row 1: Title */}
+          <motion.h1
+            className="text-2xl font-bold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            {currentScene.story.name}
+          </motion.h1>
+  
+          {/* Row 2: Image */}
+          <motion.img
+            key={currentImage}
+            src={currentImage}
+            alt="Scene"
+            className="w-full max-w-md rounded-lg shadow-lg"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6 }}
           />
-        </div>
-      )}
+  
+          {/* Row 3: Dialogue or Question */}
+          <div className="w-full max-w-md flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              {showNextDialogue && (
+                <motion.div
+                  key={`dialogue-${currentDialogueIndex}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <TypewriterDialogueBox
+                    text={currentDialogue}
+                    speed={60}
+                    onComplete={handleDialogueComplete}
+                  />
+                </motion.div>
+              )}
+  
+              {showQuestion && (
+                <motion.div
+                  key={`question-${currentQuestionIndex}`}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <QuestionBox
+                    question={currentQuestion}
+                    onAnswered={handleQuestionAnswered}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
-}
+  
+};
+
+export default StoryPlayer;
