@@ -1,5 +1,12 @@
-import Lottie from "lottie-react";
-import loadingAnimation from "@/public/loadingAnimation.json"; // Your animation file
+"use client";
+
+import dynamic from 'next/dynamic';
+import loadingAnimation from "@/public/loadingAnimation.json";
+
+const Lottie = dynamic(() => import('lottie-react'), {
+  ssr: false,
+  loading: () => <div className="w-32 h-32 bg-purple-200 rounded-full animate-pulse" />
+});
 
 const LoadingScreen = () => {
   return (
