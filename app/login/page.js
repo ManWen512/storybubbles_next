@@ -6,6 +6,7 @@ import { fetchProfileImages, createUser } from "@/redux/slices/profileSlice";
 import { useRouter } from "next/navigation";
 import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import Notification from "@/app/components/notification";
+import LoadingScreen from "../components/loadingScreen";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -17,7 +18,6 @@ export default function ProfilePage() {
   useEffect(() => {
     dispatch(fetchProfileImages());
   }, [dispatch]);
-
 
   //Notification
   const [notif, setNotif] = useState({
@@ -67,7 +67,11 @@ export default function ProfilePage() {
       />
       <h1 className="text-xl font-bold mb-4">Profile Images</h1>
 
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="flex items-center justify-center">
+          <LoadingScreen />
+        </div>
+      )}
       {error && <p className="text-red-500">Error: {error}</p>}
       <div className="flex justify-center">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 place-items-center">

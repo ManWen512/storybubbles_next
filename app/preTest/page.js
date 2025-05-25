@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchTest, submitTestAnswers } from "@/redux/slices/testSlice";
 import { useRouter } from "next/navigation";
 import Notification from "../components/notification";
+import LoadingScreen from "../components/loadingScreen";
 
 export default function PreTest() {
   const router = useRouter();
@@ -13,7 +14,6 @@ export default function PreTest() {
   const { preTest, status } = useSelector((state) => state.test);
 
   const [answers, setAnswers] = useState({});
- 
 
   //Notification
   const [notif, setNotif] = useState({
@@ -26,7 +26,6 @@ export default function PreTest() {
     setNotif({ show: true, message, type });
   };
 
-
   useEffect(() => {
     dispatch(fetchTest(1)); // 1 = preTest
   }, [dispatch]);
@@ -36,8 +35,6 @@ export default function PreTest() {
       ...prev,
       [questionId]: choiceId,
     }));
-
- 
   };
 
   const handleSubmit = (e) => {
@@ -50,8 +47,18 @@ export default function PreTest() {
       return;
     }
 
+    // Create a copy of answers
+    const finalAnswers = { ...answers };
 
-    dispatch(submitTestAnswers({ userId, answers }))
+    // Set default answers for unanswered questions
+    preTest.forEach((question) => {
+      if (!finalAnswers[question.id]) {
+        // Set the first choice as default answer
+        finalAnswers[question.id] = question.choices[0].id;
+      }
+    });
+
+    dispatch(submitTestAnswers({ userId, answers: finalAnswers }))
       .then(() => {
         showNotification("Successfully Submitted", "success");
         router.push("/story1");
@@ -60,17 +67,6 @@ export default function PreTest() {
         showNotification("Submission Failed", "error");
       });
   };
-
-  if (status === "loading")
-    return (
-      <div className="flex items-center justify-center">
-        <img src="/animation.gif" />
-      </div>
-    );
-  if (status === "failed")
-    return (
-      <p className="text-center text-red-500">Failed to load questions.</p>
-    );
 
   return (
     <div className="max-w-3xl mx-auto p-4">
@@ -84,17 +80,26 @@ export default function PreTest() {
         Game Feedback Form
       </h1>
 
+      {status === "loading" ? (
+        <div className="flex items-center justify-center">
+          <LoadingScreen />
+        </div>
+      ) : (
+        ""
+      )}
+
+      {status === "failed" ? (
+        <p className="text-center text-red-500">Failed to load questions.</p>
+      ) : (
+        ""
+      )}
       <form onSubmit={handleSubmit}>
         {preTest.map((q) => (
           <div key={q.id} className="mb-6">
-            <h2
-              className="text-lg font-quicksand mb-2"
-            >
+            <h2 className="text-lg font-quicksand mb-2">
               {q.id}. {q.questionText}
             </h2>
-            <div
-              className="grid grid-cols-5 gap-1 place-items-center"
-            >
+            <div className="grid grid-cols-5 gap-1 place-items-center">
               {q.choices.map((choice, index) => (
                 <label
                   key={index}

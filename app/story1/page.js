@@ -10,6 +10,7 @@ import QuestionTask from "../components/questionTask";
 import AudioControls from "../components/audioControls";
 import { Howl } from "howler";
 import { motion, AnimatePresence } from "framer-motion";
+import LoadingScreen from "../components/loadingScreen";
 
 export default function StoryOne() {
   const dispatch = useDispatch();
@@ -121,7 +122,7 @@ export default function StoryOne() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [activeDialogueIndex, showQuestion]);
+  }, [showQuestion]);
 
   // Reset when scene changes
   useEffect(() => {
@@ -141,17 +142,17 @@ export default function StoryOne() {
 
   if (status === "loading" || status === "idle") {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading story...
-      </div>
+      <div className="flex items-center justify-center">
+      <LoadingScreen />
+    </div>
     );
   }
 
   if (!storyOne || !storyOne.scenes) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Story data not available
-      </div>
+      <div className="flex items-center justify-center">
+      <LoadingScreen />
+    </div>
     );
   }
 
@@ -212,7 +213,7 @@ export default function StoryOne() {
         setShowQuestion(false);
         setShowContinue(true);
       }
-    }, 1500); // 1.5 second delay before moving to next question
+    }, 2500); // 1.5 second delay before moving to next question
   };
 
   if (!started) {
@@ -234,7 +235,7 @@ export default function StoryOne() {
           transition={{ duration: 0.5 }}
         >
           {/* Scene title */}
-          <h2 className="text-2xl font-bold text-center mb-6">
+          <h2 className="text-2xl font-quicksand font-bold text-center mb-6">
             {currentScene.name}
           </h2>
 
@@ -253,7 +254,7 @@ export default function StoryOne() {
           {/* Current active dialogue */}
           {currentScene.dialogues?.[activeDialogueIndex] && (
             <motion.div
-              key={activeDialogueIndex}
+              key={`dialogue-${currentSceneIndex}-${activeDialogueIndex}`}
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.4 }}
@@ -273,7 +274,7 @@ export default function StoryOne() {
             (currentScene.questions[currentQuestionState.index].choices
               ?.length > 0 ? (
               <motion.div
-                key={currentQuestionState.index}
+                key={`question-${currentSceneIndex}-${currentQuestionState.index}`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
@@ -316,7 +317,7 @@ export default function StoryOne() {
                 transition={{ duration: 0.3 }}
                 className="text-center"
               >
-                <p className="text-white text-xl font-semibold bg-black bg-opacity-50 px-6 py-3 rounded-lg">
+                <p className="text-white text-xl font-quicksand bg-black bg-opacity-50 px-6 py-3 rounded-lg">
                   Click anywhere to{" "}
                   {currentSceneIndex < storyOne.scenes.length - 1
                     ? "continue"

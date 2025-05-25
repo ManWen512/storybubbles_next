@@ -88,14 +88,16 @@ export default function QuestionTask({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + (index * 0.1) }}
                   onClick={() => !answered && setSelectedAnswer(index + 1)}
-                  className={`p-3 border rounded cursor-pointer transition-colors
-                    ${selectedAnswer === index + 1 ? 'border-purple-500 bg-purple-50' : 'border-gray-300'}
+                  className={`justify-between items-center flex font-quicksand px-3 py-5 border-2 rounded-2xl cursor-pointer transition-colors hover:border-purple-400 
+                    ${selectedAnswer === index + 1 ? 'border-2 border-purple-500 bg-purple-50' : 'border-gray-300'}
                     ${showResult && index + 1 === correctAnswerIndex ? 'bg-green-100 border-green-500' : ''}
                     ${showResult && selectedAnswer === index + 1 && selectedAnswer !== correctAnswerIndex ? 'bg-red-100 border-red-400' : ''}
                     ${answered ? 'cursor-default' : 'cursor-pointer'}
                   `}
                 >
                   {choice?.label || `Option ${index + 1}`}
+                  {/* {choice?.emoji} */}
+                  <span><img src='/banana.gif' className='w-10 h-10 rounded-xl'/></span>
                 </motion.div>
               ))}
             </div>

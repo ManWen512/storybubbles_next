@@ -3,7 +3,7 @@
 
 export default function StoryImage({ imageUrl }) {
   return (
-    <div className="w-full max-w-xl xl:max-w-lg mx-auto mb-6">
+    <div className="w-full max-w-lg 2xl:max-w-2xl mx-auto mb-6">
       <img 
         src={imageUrl} 
         alt="Story scene" 

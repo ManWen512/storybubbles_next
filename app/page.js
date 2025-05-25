@@ -30,7 +30,7 @@ export default function Home() {
       <div className="relative z-10  flex items-center justify-center  min-h-screen">
         <button
           onClick={handleLogin}
-          className="absolute font-bjola bottom-20 sm:bottom-5 px-10 py-4 bg-white text-purple-500 text-2xl font-bold rounded-xl shadow-2xl hover:scale-110 transition ease-in-out delay-150"
+          className="absolute font-quicksand bottom-20 sm:bottom-5 px-10 py-4 bg-white text-purple-500 text-2xl font-bold rounded-xl shadow-2xl hover:scale-110 transition ease-in-out delay-150"
         >
           LOGIN
         </button>
