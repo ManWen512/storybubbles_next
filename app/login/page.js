@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProfileImages, createUser } from "@/redux/slices/profileSlice";
 import { useRouter } from "next/navigation";
 import { PiArrowFatLinesRightFill } from "react-icons/pi";
+import Notification from "@/app/components/notification";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -17,36 +18,53 @@ export default function ProfilePage() {
     dispatch(fetchProfileImages());
   }, [dispatch]);
 
+
+  //Notification
+  const [notif, setNotif] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotif({ show: true, message, type });
+  };
+
+  //handleSubmit
   const handleSubmit = () => {
-    if (!username || selectedIndex === null ) {
-      alert("Please enter a username and select an image.");
+    if (!username || selectedIndex === null) {
+      showNotification("Please enter a username and select an image.", "error");
       return;
-    }else if(username.trim().length < 4){
-      alert("Username must be more than 3 letters");
+    } else if (username.trim().length < 4) {
+      showNotification("Username must be more than 3 letters", "error");
       return;
     }
-  
+
     const selectedImageUrl = images[selectedIndex];
-  
+
     dispatch(createUser({ username, profileImage: selectedImageUrl }))
       .unwrap()
       .then((data) => {
-       // Store user ID in local storage
-       if (data && data.id) {
-        localStorage.setItem('userId', data.id);
-      }
-      alert("User created successfully!");
-      router.push("/preTest");
+        // Store user ID in local storage
+        if (data && data.id) {
+          localStorage.setItem("userId", data.id);
+        }
+        showNotification("User successfully created!", "success");
+        router.push("/preTest");
       })
       .catch((err) => {
-        alert("Failed to create user: " + err);
+        showNotification("Failed to create user: " + err, "error");
       });
-
-      
   };
 
   return (
     <div className="p-4">
+      <Notification
+        show={notif.show}
+        message={notif.message}
+        type={notif.type}
+        onClose={() => setNotif({ ...notif, show: false })}
+      />
       <h1 className="text-xl font-bold mb-4">Profile Images</h1>
 
       {loading && <p>Loading...</p>}
@@ -78,12 +96,12 @@ export default function ProfilePage() {
         />
       </div>
       <div className="flex justify-center mt-5">
-      <button
-        onClick={handleSubmit}
-        className="w-18 h-18 cursor-pointer  bg-purple-400 text-white px-6 py-2 rounded-full shadow-2xl hover:bg-purple-500 transition duration-200"
-      >
-       <PiArrowFatLinesRightFill size={25}/>
-      </button>
+        <button
+          onClick={handleSubmit}
+          className="w-18 h-18 cursor-pointer  bg-purple-400 text-white px-6 py-2 rounded-full shadow-2xl hover:bg-purple-500 transition duration-200"
+        >
+          <PiArrowFatLinesRightFill size={25} />
+        </button>
       </div>
     </div>
   );

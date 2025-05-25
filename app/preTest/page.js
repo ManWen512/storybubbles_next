@@ -5,6 +5,7 @@ import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTest, submitTestAnswers } from "@/redux/slices/testSlice";
 import { useRouter } from "next/navigation";
+import Notification from "../components/notification";
 
 export default function PreTest() {
   const router = useRouter();
@@ -12,7 +13,19 @@ export default function PreTest() {
   const { preTest, status } = useSelector((state) => state.test);
 
   const [answers, setAnswers] = useState({});
-  const [unanswered, setUnanswered] = useState([]);
+ 
+
+  //Notification
+  const [notif, setNotif] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotif({ show: true, message, type });
+  };
+
 
   useEffect(() => {
     dispatch(fetchTest(1)); // 1 = preTest
@@ -24,8 +37,7 @@ export default function PreTest() {
       [questionId]: choiceId,
     }));
 
-    // Remove from unanswered if previously marked
-    setUnanswered((prev) => prev.filter((id) => id !== questionId));
+ 
   };
 
   const handleSubmit = (e) => {
@@ -34,25 +46,18 @@ export default function PreTest() {
     const userId = localStorage.getItem("userId");
 
     if (!userId) {
-      alert("User not found!");
+      showNotification("User Not Found", "error");
       return;
     }
 
-    // Find unanswered question IDs
-    const missing = preTest.filter((q) => !answers[q.id]).map((q) => q.id);
-
-    if (missing.length > 0) {
-      setUnanswered(missing);
-      return;
-    }
 
     dispatch(submitTestAnswers({ userId, answers }))
       .then(() => {
-        alert("Successfully submitted!");
+        showNotification("Successfully Submitted", "success");
         router.push("/story1");
       })
       .catch((err) => {
-        console.error("Submission failed", err);
+        showNotification("Submission Failed", "error");
       });
   };
 
@@ -69,6 +74,12 @@ export default function PreTest() {
 
   return (
     <div className="max-w-3xl mx-auto p-4">
+      <Notification
+        show={notif.show}
+        message={notif.message}
+        type={notif.type}
+        onClose={() => setNotif({ ...notif, show: false })}
+      />
       <h1 className="text-2xl font-quicksand font-bold mb-6">
         Game Feedback Form
       </h1>
@@ -77,18 +88,12 @@ export default function PreTest() {
         {preTest.map((q) => (
           <div key={q.id} className="mb-6">
             <h2
-              className={`text-lg font-quicksand mb-2 ${
-                unanswered.includes(q.id) ? "text-red-500" : ""
-              }`}
+              className="text-lg font-quicksand mb-2"
             >
               {q.id}. {q.questionText}
             </h2>
             <div
-              className={`grid grid-cols-5 gap-1 place-items-center ${
-                unanswered.includes(q.id)
-                  ? "border-2 border-red-400 p-2 rounded-lg"
-                  : ""
-              }`}
+              className="grid grid-cols-5 gap-1 place-items-center"
             >
               {q.choices.map((choice, index) => (
                 <label
