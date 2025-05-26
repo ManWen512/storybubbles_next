@@ -20,7 +20,7 @@ export default function QuestionTask({
 
   const handleSubmit = async () => {
     if (selectedAnswer !== null && !answered) {
-      console.log('User chosen index:', selectedAnswer);
+     
       
       // Get userId from localStorage
       const userId = localStorage.getItem('userId');

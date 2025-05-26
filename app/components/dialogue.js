@@ -1,15 +1,18 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Howl } from 'howler';
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { Howl } from "howler";
+import { BiSolidDownArrow } from "react-icons/bi";
 
-export default function Dialogue({ 
-  text, 
+export default function Dialogue({
+  text,
   audioUrl,
   onAudioEnd,
-  active 
+  active,
+  showContinue,
+  showQuestion,
 }) {
-  const [displayedText, setDisplayedText] = useState('');
+  const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const soundRef = useRef(null);
@@ -31,7 +34,7 @@ export default function Dialogue({
       onloaderror: () => {
         setIsPlaying(false);
         onAudioEnd?.();
-      }
+      },
     });
 
     soundRef.current = sound;
@@ -47,7 +50,7 @@ export default function Dialogue({
   // Handle text typing and audio playback
   useEffect(() => {
     if (!active) {
-      setDisplayedText('');
+      setDisplayedText("");
       setIsTyping(false);
       setIsPlaying(false);
       if (soundRef.current) {
@@ -58,7 +61,7 @@ export default function Dialogue({
 
     // Start both text and audio simultaneously
     setIsTyping(true);
-    
+
     let currentIndex = 0;
     const textLength = text.length;
     const typingSpeed = 30; // milliseconds per character
@@ -115,10 +118,22 @@ export default function Dialogue({
         {isPlaying && (
           <div className="absolute top-2 right-2 flex items-center gap-2">
             <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
-            
           </div>
         )}
       </div>
+      {showContinue && !showQuestion && (
+        <>
+          <div>
+            <BiSolidDownArrow 
+              className="absolute bottom-1 right-2 text-purple-400 animate-bounce" 
+              size={20} 
+            />
+          </div>
+          <p className="absolute -bottom-7 inset-x-0 text-center text-purple-500  animate-pulse font-quicksand">
+            Click anywhere to continue
+          </p>
+        </>
+      )}
     </motion.div>
   );
 }

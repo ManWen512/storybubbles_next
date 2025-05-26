@@ -14,8 +14,8 @@ export default function Notification({ message, type = "success", show, onClose 
   }, [show, onClose]);
 
   const colors = {
-    success: "bg-green-500",
-    error: "bg-red-500",
+    success: "bg-green-400",
+    error: "bg-red-400",
   };
 
   return (

@@ -11,6 +11,8 @@ import AudioControls from "../components/audioControls";
 import { Howl } from "howler";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingScreen from "../components/loadingScreen";
+import Notification from "../components/notification";
+import ProgressBar from "../components/progressBar";
 
 export default function StoryOne() {
   const dispatch = useDispatch();
@@ -32,6 +34,16 @@ export default function StoryOne() {
 
   const messagesEndRef = useRef(null);
 
+  const [notif, setNotif] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotif({ show: true, message, type });
+  };
+
   // Initialize background music
   useEffect(() => {
     if (storyOne?.story?.bgMusic) {
@@ -49,7 +61,7 @@ export default function StoryOne() {
           withCredentials: false,
         },
         onloaderror: (id, error) => {
-          console.error("Background music load error:", error);
+          showNotification("Failed to load background music", "error");
         },
       });
       setBgMusic(music);
@@ -143,16 +155,16 @@ export default function StoryOne() {
   if (status === "loading" || status === "idle") {
     return (
       <div className="flex items-center justify-center">
-      <LoadingScreen />
-    </div>
+        <LoadingScreen />
+      </div>
     );
   }
 
   if (!storyOne || !storyOne.scenes) {
     return (
       <div className="flex items-center justify-center">
-      <LoadingScreen />
-    </div>
+        <LoadingScreen />
+      </div>
     );
   }
 
@@ -184,7 +196,7 @@ export default function StoryOne() {
       // Move to next scene
       setCurrentSceneIndex((prev) => prev + 1);
     } else {
-      console.log("Story completed!");
+      showNotification("Story completed! Thank you for playing!", "success");
       // Stop background music when story ends
       if (bgMusic) {
         bgMusic.stop();
@@ -221,21 +233,36 @@ export default function StoryOne() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50 py-8">
       {/* Audio Controls - Moved outside AnimatePresence */}
       {started && bgMusic && <AudioControls bgMusic={bgMusic} />}
+      
+      <Notification
+        show={notif.show}
+        message={notif.message}
+        type={notif.type}
+        onClose={() => setNotif({ ...notif, show: false })}
+      />
+
+      {/* Progress Bar */}
+      {started && storyOne?.scenes && (
+        <ProgressBar 
+          currentScene={currentSceneIndex} 
+          totalScenes={storyOne.scenes.length} 
+        />
+      )}
       
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSceneIndex}
-          className="container mx-auto px-4"
+          className="container mx-auto px-3"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -30 }}
           transition={{ duration: 0.5 }}
         >
           {/* Scene title */}
-          <h2 className="text-2xl font-quicksand font-bold text-center mb-6">
+          <h2 className="text-2xl font-quicksand font-bold text-center mb-4">
             {currentScene.name}
           </h2>
 
@@ -264,6 +291,9 @@ export default function StoryOne() {
                 audioUrl={currentScene.dialogueSounds?.[activeDialogueIndex]}
                 onAudioEnd={handleDialogueComplete}
                 active={true}
+                showContinue={showContinue}
+                showQuestion={showQuestion}
+                handleContinue={handleContinue}
               />
             </motion.div>
           )}
@@ -309,22 +339,8 @@ export default function StoryOne() {
           {showContinue && !showQuestion && (
             <div
               onClick={handleContinue}
-              className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center cursor-pointer z-10"
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="text-center"
-              >
-                <p className="text-white text-xl font-quicksand bg-black bg-opacity-50 px-6 py-3 rounded-lg">
-                  Click anywhere to{" "}
-                  {currentSceneIndex < storyOne.scenes.length - 1
-                    ? "continue"
-                    : "finish"}
-                </p>
-              </motion.div>
-            </div>
+              className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center cursor-pointer z-10"
+            ></div>
           )}
 
           {/* Empty div for auto-scrolling */}

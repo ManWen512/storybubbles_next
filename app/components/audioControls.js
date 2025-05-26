@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
+import Notification from "./notification";
 
 export default function AudioControls({ bgMusic }) {
   // Initialize state from localStorage if available
@@ -21,6 +22,12 @@ export default function AudioControls({ bgMusic }) {
     return 0.5;
   });
 
+  const [notif, setNotif] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
   // Save state to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('audioMuted', JSON.stringify(isMuted));
@@ -30,13 +37,17 @@ export default function AudioControls({ bgMusic }) {
     localStorage.setItem('audioVolume', volume.toString());
   }, [volume]);
 
+  const showNotification = (message, type = "success") => {
+    setNotif({ show: true, message, type });
+  };
+
   useEffect(() => {
     if (bgMusic) {
       try {
         bgMusic.volume(volume);
         bgMusic.mute(isMuted);
       } catch (error) {
-        console.error('Error controlling background music:', error);
+        showNotification("Error controlling background music", "error");
       }
     }
   }, [volume, isMuted, bgMusic]);
@@ -54,11 +65,17 @@ export default function AudioControls({ bgMusic }) {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed bottom-4   right-4 bg-white p-3 rounded-lg shadow-lg flex items-center gap-3 z-50"
+      className="fixed bottom-4 right-4 flex items-center gap-3 z-50"
     >
+      <Notification
+        show={notif.show}
+        message={notif.message}
+        type={notif.type}
+        onClose={() => setNotif({ ...notif, show: false })}
+      />
       <button
         onClick={toggleMute}
-        className="text-gray-700 hover:text-purple-600 transition-colors"
+        className="text-purple-400 hover:text-purple-600 transition-colors"
       >
         {isMuted ? <IoVolumeMute size={24} /> : <IoVolumeHigh size={24} />}
       </button>
@@ -69,7 +86,7 @@ export default function AudioControls({ bgMusic }) {
         step="0.1"
         value={volume}
         onChange={handleVolumeChange}
-        className="w-24 accent-purple-500"
+        className=" accent-purple-500  w-full"
       />
     </motion.div>
   );

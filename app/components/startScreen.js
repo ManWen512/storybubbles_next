@@ -3,7 +3,7 @@
 
 export default function StartScreen({ onStart }) {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 font-quicksand">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 font-quicksand bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50">
       <h1 className="text-4xl font-bold mb-8">Milo's Adventure</h1>
       <button
         onClick={onStart}

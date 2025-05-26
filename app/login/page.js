@@ -96,7 +96,7 @@ export default function ProfilePage() {
           placeholder="Enter your username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="border border-gray-300 rounded-xl px-4 py-2 w-64 h-12 text-center focus:outline-none focus:ring-4 focus:ring-purple-400"
+          className="border border-gray-300 rounded-xl px-4 py-2 w-64 h-12 text-center focus:outline-none focus:ring-4 focus:ring-purple-400 dark:text-black font-quicksand"
         />
       </div>
       <div className="flex justify-center mt-5">
