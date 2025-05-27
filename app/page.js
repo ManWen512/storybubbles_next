@@ -17,15 +17,19 @@ export default function Home() {
         style={{
           backgroundImage: 'url("/Introduction.png")',
         }}
-      />
+        
+      >  <img src='/logo/StoryBubbles_Logo.png' className="w-48 h-48 m-5"/>
+</div>
+      
 
       <div
         className="absolute inset-0 bg-cover bg-center sm:hidden"
         style={{
           backgroundImage: 'url("/Homepage_sm.png")',
         }}
-      />
+      > <img src='/logo/StoryBubbles_Logo.png' className="w-52 h-52 m-5"/></div>
 
+    
       {/* Main content */}
       <div className="relative z-10  flex items-center justify-center  min-h-screen">
         <button
@@ -35,6 +39,7 @@ export default function Home() {
           LOGIN
         </button>
       </div>
+      
     </div>
   );
 }

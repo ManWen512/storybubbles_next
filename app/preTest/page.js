@@ -7,6 +7,7 @@ import { fetchTest, submitTestAnswers } from "@/redux/slices/testSlice";
 import { useRouter } from "next/navigation";
 import Notification from "../components/notification";
 import LoadingScreen from "../components/loadingScreen";
+import SoundButton from "../components/soundButton";
 
 export default function PreTest() {
   const router = useRouter();
@@ -136,12 +137,12 @@ export default function PreTest() {
             </div>
           ))}
           <div className="flex justify-center mt-5 ">
-            <button
+            <SoundButton
               type="submit"
               className="w-18 h-18 cursor-pointer bg-purple-400 text-white px-6 py-2 rounded-full shadow-2xl hover:bg-purple-500 transition duration-200"
             >
               <PiArrowFatLinesRightFill size={25} />
-            </button>
+            </SoundButton>
           </div>
         </form>
       </div>

@@ -20,6 +20,11 @@ export default function StoryOne() {
   const [bgMusic, setBgMusic] = useState(null);
   const [narrativeSound, setNarrativeSound] = useState(null);
 
+  // Update page title
+  useEffect(() => {
+    document.title = "Story 1 - Story Bubbles";
+  }, []);
+
   // State management
   const [started, setStarted] = useState(false);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
@@ -132,9 +137,25 @@ export default function StoryOne() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Handle scrolling for questions
   useEffect(() => {
-    scrollToBottom();
+    if (showQuestion) {
+      setTimeout(scrollToBottom, 100);
+    } else {
+      setTimeout(scrollToTop, 100);
+    }
   }, [showQuestion]);
+
+  // Handle scrolling for dialogues
+  useEffect(() => {
+    if (activeDialogueIndex > 0) {
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [activeDialogueIndex]);
 
   // Reset when scene changes
   useEffect(() => {
@@ -245,13 +266,15 @@ export default function StoryOne() {
       />
 
       {/* Progress Bar */}
-      {started && storyOne?.scenes && (
-        <ProgressBar 
-          currentScene={currentSceneIndex} 
-          totalScenes={storyOne.scenes.length} 
-        />
+      {started && (
+        <div className="container mx-auto px-3 mb-4">
+          <ProgressBar 
+            currentScene={currentSceneIndex } 
+            totalScenes={storyOne.scenes.length} 
+          />
+        </div>
       )}
-      
+
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSceneIndex}

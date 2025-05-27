@@ -1,10 +1,14 @@
 // components/QuestionTask.jsx
 "use client";
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { submitStoryAnswer } from '@/redux/slices/storySlice';
 import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import { motion, AnimatePresence } from 'framer-motion';
+import { Howl } from 'howler';
+
+// Create a cache for preloaded sounds
+const soundCache = new Map();
 
 export default function QuestionTask({ 
   question, 
@@ -17,18 +21,49 @@ export default function QuestionTask({
 }) {
   const dispatch = useDispatch();
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const correctSoundRef = useRef(null);
+  const incorrectSoundRef = useRef(null);
+
+  // Initialize sounds
+  useEffect(() => {
+    // Initialize correct answer sound
+    if (!soundCache.has('correct')) {
+      const correctSound = new Howl({
+        src: ['/sounds/correct.mp3'],
+        volume: 0.5,
+        html5: true,
+        preload: true
+      });
+      soundCache.set('correct', correctSound);
+    }
+    correctSoundRef.current = soundCache.get('correct');
+
+    // Initialize incorrect answer sound
+    if (!soundCache.has('incorrect')) {
+      const incorrectSound = new Howl({
+        src: ['/sounds/incorrect.mp3'],
+        volume: 0.5,
+        html5: true,
+        preload: true
+      });
+      soundCache.set('incorrect', incorrectSound);
+    }
+    incorrectSoundRef.current = soundCache.get('incorrect');
+
+    return () => {
+      // Don't unload sounds as they're cached
+      correctSoundRef.current = null;
+      incorrectSoundRef.current = null;
+    };
+  }, []);
 
   const handleSubmit = async () => {
     if (selectedAnswer !== null && !answered) {
-     
-      
       // Get userId from localStorage
       const userId = localStorage.getItem('userId');
       
       if (!userId) {
         alert('Please login to save your answer progress');
-        // Still show the result to user even if not logged in
-        onAnswer(selectedAnswer === correctAnswerIndex);
         return;
       }
       
@@ -40,6 +75,13 @@ export default function QuestionTask({
             chosenAnswer: selectedAnswer,
             userId
           })).unwrap();
+          
+          // Play appropriate sound based on answer
+          if (selectedAnswer === correctAnswerIndex) {
+            correctSoundRef.current?.play();
+          } else {
+            incorrectSoundRef.current?.play();
+          }
           
           // Call the original onAnswer callback
           onAnswer(selectedAnswer === correctAnswerIndex);
@@ -62,7 +104,7 @@ export default function QuestionTask({
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={questionId} // This ensures animation triggers on question change
+        key={questionId}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
@@ -96,8 +138,7 @@ export default function QuestionTask({
                   `}
                 >
                   {choice?.label || `Option ${index + 1}`}
-                  {/* {choice?.emoji} */}
-                  <span><img src='/banana.gif' className='w-10 h-10 rounded-xl'/></span>
+                  <span><img src={choice.emoji} alt='Choice Emoji' className='w-10 h-10 rounded-xl'/></span>
                 </motion.div>
               ))}
             </div>

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import Notification from "@/app/components/notification";
 import LoadingScreen from "../components/loadingScreen";
+import SoundButton from "../components/soundButton";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -50,7 +51,15 @@ export default function ProfilePage() {
           localStorage.setItem("userId", data.id);
         }
         showNotification("User successfully created!", "success");
-        router.push("/preTest");
+        
+        // Check if there's a redirect URL stored
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        if (redirectUrl) {
+          localStorage.removeItem('redirectAfterLogin'); // Clean up
+          router.push(redirectUrl);
+        } else {
+          router.push("/preTest");
+        }
       })
       .catch((err) => {
         showNotification("Failed to create user: " + err, "error");
@@ -100,12 +109,12 @@ export default function ProfilePage() {
         />
       </div>
       <div className="flex justify-center mt-5">
-        <button
+        <SoundButton
           onClick={handleSubmit}
-          className="w-18 h-18 cursor-pointer  bg-purple-400 text-white px-6 py-2 rounded-full shadow-2xl hover:bg-purple-500 transition duration-200"
+          className="w-18 h-18 cursor-pointer bg-purple-400 text-white px-6 py-2 rounded-full shadow-2xl hover:bg-purple-500 transition duration-200"
         >
           <PiArrowFatLinesRightFill size={25} />
-        </button>
+        </SoundButton>
       </div>
     </div>
   );
