@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.1",
+    "@tsparticles/confetti": "^3.8.1",
     "framer-motion": "^12.12.1",
     "howler": "^2.2.4",
     "lottie-react": "^2.4.1",

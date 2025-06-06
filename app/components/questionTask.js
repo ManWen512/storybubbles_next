@@ -6,6 +6,7 @@ import { submitStoryAnswer } from '@/redux/slices/storySlice';
 import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Howl } from 'howler';
+import ConfettiBurst from './confettiBurst';
 
 // Create a cache for preloaded sounds
 const soundCache = new Map();
@@ -13,7 +14,7 @@ const soundCache = new Map();
 export default function QuestionTask({ 
   question, 
   choices = [],
-  correctAnswerIndex = 1,
+  correctAnswerIndex = 0,
   onAnswer,
   answered = false,
   showResult = false,
@@ -99,7 +100,8 @@ export default function QuestionTask({
   };
 
   // Safely get the correct answer label
-  const correctAnswerLabel = choices[correctAnswerIndex-1]?.label || '';
+  const correctAnswerLabel = choices[correctAnswerIndex]?.label || '';
+
 
   return (
     <AnimatePresence mode="wait">
@@ -129,11 +131,11 @@ export default function QuestionTask({
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + (index * 0.1) }}
-                  onClick={() => !answered && setSelectedAnswer(index + 1)}
+                  onClick={() => !answered && setSelectedAnswer(index )}
                   className={`justify-between items-center flex font-quicksand px-3 py-5 border-2 rounded-2xl cursor-pointer transition-colors hover:border-purple-400 
-                    ${selectedAnswer === index + 1 ? 'border-2 border-purple-500 bg-purple-50' : 'border-gray-300'}
-                    ${showResult && index + 1 === correctAnswerIndex ? 'bg-green-100 border-green-500' : ''}
-                    ${showResult && selectedAnswer === index + 1 && selectedAnswer !== correctAnswerIndex ? 'bg-red-100 border-red-400' : ''}
+                    ${selectedAnswer === index  ? 'border-2 border-purple-500 bg-purple-50' : 'border-gray-300'}
+                    ${showResult && index  === correctAnswerIndex ? 'bg-green-100 border-green-500' : ''}
+                    ${showResult && selectedAnswer === index  && selectedAnswer !== correctAnswerIndex ? 'bg-red-100 border-red-400' : ''}
                     ${answered ? 'cursor-default' : 'cursor-pointer'}
                   `}
                 >
@@ -179,6 +181,7 @@ export default function QuestionTask({
                     }}
                     className="text-green-600 flex items-center justify-center gap-2"
                   >
+                    
                     <motion.span
                       initial={{ rotate: -180, scale: 0 }}
                       animate={{ rotate: 0, scale: 1 }}

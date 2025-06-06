@@ -4,14 +4,11 @@ import { authFetch } from "../lib/authFetch";
 const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Fetch a specific story by ID
-export const fetchStory = createAsyncThunk(
-  "story/fetchStory",
-  async (id) => {
-    const response = await authFetch(`${accUrl}/story?storyId=${id}`);
-    const data = await response.json();
-    return { id, stories: data };
-  }
-);
+export const fetchStory = createAsyncThunk("story/fetchStory", async (id) => {
+  const response = await authFetch(`${accUrl}/story?storyId=${id}`);
+  const data = await response.json();
+  return { id, stories: data };
+});
 
 // Submit an answer to the backend
 export const submitStoryAnswer = createAsyncThunk(
@@ -23,7 +20,7 @@ export const submitStoryAnswer = createAsyncThunk(
         body: JSON.stringify({
           questionId,
           chosenAnswer,
-          user: { id: userId },
+          userId,
         }),
         headers: {
           "Content-Type": "application/json",

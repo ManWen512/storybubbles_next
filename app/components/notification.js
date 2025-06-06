@@ -18,19 +18,17 @@ export default function Notification({ message, type = "success", show, onClose 
     error: "bg-red-400",
   };
 
+  if (!show) return null;
+
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 50 }}
-          transition={{ duration: 0.3 }}
-          className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-lg text-white shadow-lg ${colors[type]}`}
-        >
-          {message}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div
+      className={`fixed top-5 right-5 z-[9999] px-4 py-3 rounded-lg text-white shadow-lg ${colors[type]} transform transition-all duration-300 ease-in-out`}
+      style={{
+        transform: show ? 'translateX(0)' : 'translateX(100%)',
+        opacity: show ? 1 : 0,
+      }}
+    >
+      {message}
+    </div>
   );
 }

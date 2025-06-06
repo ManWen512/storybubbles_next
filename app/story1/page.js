@@ -13,12 +13,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import LoadingScreen from "../components/loadingScreen";
 import Notification from "../components/notification";
 import ProgressBar from "../components/progressBar";
+import { useRouter } from "next/navigation";
 
 export default function StoryOne() {
   const dispatch = useDispatch();
   const { storyOne, status } = useSelector((state) => state.story);
   const [bgMusic, setBgMusic] = useState(null);
   const [narrativeSound, setNarrativeSound] = useState(null);
+  const router = useRouter();
 
   // Update page title
   useEffect(() => {
@@ -217,11 +219,15 @@ export default function StoryOne() {
       // Move to next scene
       setCurrentSceneIndex((prev) => prev + 1);
     } else {
-      showNotification("Story completed! Thank you for playing!", "success");
+      showNotification("Story completed! Redirecting to results...", "success");
       // Stop background music when story ends
       if (bgMusic) {
         bgMusic.stop();
       }
+      // Redirect to ending page after a short delay
+      setTimeout(() => {
+        router.push('/ending');
+      }, 1500);
     }
   };
 

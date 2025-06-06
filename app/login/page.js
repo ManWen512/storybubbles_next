@@ -8,6 +8,7 @@ import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import Notification from "@/app/components/notification";
 import LoadingScreen from "../components/loadingScreen";
 import SoundButton from "../components/soundButton";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -46,9 +47,11 @@ export default function ProfilePage() {
     dispatch(createUser({ username, profileImage: selectedImageUrl }))
       .unwrap()
       .then((data) => {
-        // Store user ID in local storage
+        // Store user ID and profile image in local storage
         if (data && data.id) {
           localStorage.setItem("userId", data.id);
+          localStorage.setItem("profileImage", selectedImageUrl);
+          localStorage.setItem("username", username);
         }
         showNotification("User successfully created!", "success");
         
@@ -67,14 +70,14 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 h-screen w-screen bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50">
       <Notification
         show={notif.show}
         message={notif.message}
         type={notif.type}
         onClose={() => setNotif({ ...notif, show: false })}
       />
-      <h1 className="text-xl font-bold mb-4">Profile Images</h1>
+      <h1 className="text-xl font-quicksand dark font-bold mb-4">Profile Images</h1>
 
       {loading && (
         <div className="flex items-center justify-center">
@@ -85,17 +88,24 @@ export default function ProfilePage() {
       <div className="flex justify-center">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 place-items-center">
           {images.map((img, index) => (
-            <img
+            <div
               key={index}
-              src={img} // Adjust according to your API response
-              alt={`Profile ${index}`}
               onClick={() => setSelectedIndex(index)}
-              className={`w-36 h-36 rounded-2xl shadow cursor-pointer transition duration-200 ${
+              className={`relative w-36 h-36 xl:w-40 xl:h-40 2xl:w-52 2xl:h-52 rounded-2xl shadow cursor-pointer transition duration-200 ${
                 selectedIndex === index
                   ? "ring-4 ring-purple-400"
                   : "hover:ring-2 hover:ring-gray-300"
               }`}
-            />
+            >
+              <Image
+                src={img}
+                alt={`Profile ${index}`}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="rounded-2xl object-cover"
+              />
+            </div>
           ))}
         </div>
       </div>
