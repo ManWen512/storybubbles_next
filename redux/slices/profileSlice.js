@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-
 // Fetch profile images
 export const fetchProfileImages = createAsyncThunk(
   'profile/fetchProfileImages',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch('/api/profile_images');
+      const res = await fetch(`/api/profile_images`);
       const data = await res.json();
       return data;
     } catch (err) {

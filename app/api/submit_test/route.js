@@ -5,12 +5,12 @@ export async function POST(request) {
     try {
         const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         const { userId, questionsAnswers } = await request.json();
-        
+
         console.log('Received payload:', { userId, questionsAnswers });
 
         const res = await authFetch(`${accUrl}/answer/test-answers`, {
             method: 'POST',
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 userId,
                 questionsAnswers
             }),
@@ -18,10 +18,10 @@ export async function POST(request) {
                 'Content-Type': 'application/json',
             },
         });
-    
+
         // First get the response text
         const responseText = await res.text();
-        
+
         // Try to parse it as JSON if possible
         let data;
         try {
@@ -29,9 +29,9 @@ export async function POST(request) {
         } catch (parseError) {
             console.error('Response parsing error:', parseError);
             // If parsing fails, return the raw text
-            return NextResponse.json({ 
+            return NextResponse.json({
                 message: responseText,
-                status: res.status 
+                status: res.status
             });
         }
 

@@ -1,5 +1,3 @@
-
-
 export const authFetch = async (url, options = {}) => {
     // 🔐 Hardcoded username and password
     const username = process.env.API_USERNAME;
@@ -21,4 +19,3 @@ export const authFetch = async (url, options = {}) => {
   
     return res;
   };
-  

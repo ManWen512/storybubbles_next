@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-
 // Fetch Test Questions (Pre = 1, Post = 2)
 export const fetchTest = createAsyncThunk(
   "test/fetchTest",

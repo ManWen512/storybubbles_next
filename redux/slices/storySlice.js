@@ -1,10 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-
 // Fetch a specific story by ID
-export const fetchStory = createAsyncThunk(
-  "story/fetchStory", 
-  async (id) => {
+export const fetchStory = createAsyncThunk("story/fetchStory", async ({id}) => {
   const response = await fetch(`/api/story?storyId=${id}`);
   const data = await response.json();
   return { id, stories: data };
