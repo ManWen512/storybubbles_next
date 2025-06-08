@@ -1,19 +1,64 @@
 "use client";
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import SoundButton from '../components/soundButton';
+import AnswersPopup from '../components/answersPopup';
+
+// Example questions and answers data
+const exampleQuestions = [
+  {
+    id: "1",
+    questionText: "Which weapons do kings and knights use to fight?",
+    correctAnswerText: "Sword",
+    userAnswerText: "Not Answered",
+    correct: "false"
+  },
+  {
+    id: "2",
+    questionText: "What is the main theme of the story?",
+    correctAnswerText: "Friendship and teamwork",
+    userAnswerText: "Individual success",
+    correct: "false"
+  },
+  {
+    id: "3",
+    questionText: "Who helped the main character solve the problem?",
+    correctAnswerText: "The classmates",
+    userAnswerText: "The classmates",
+    correct: "true"
+  },
+  {
+    id: "4",
+    questionText: "What was the main challenge in the story?",
+    correctAnswerText: "Making new friends",
+    userAnswerText: "Finding a lost item",
+    correct: "false"
+  },
+  {
+    id: "5",
+    questionText: "What was the most important lesson from the story?",
+    correctAnswerText: "Work together",
+    userAnswerText: "Work together",
+    correct: "true"
+  }
+];
 
 export default function EndingPage() {
   const router = useRouter();
   const [profileImage, setProfileImage] = useState(null);
   const [username, setUsername] = useState(null);
   const [imageError, setImageError] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [questions, setQuestions] = useState(exampleQuestions);
 
   useEffect(() => {
     const storedImage = localStorage.getItem('profileImage');
     const storedUsername = localStorage.getItem('username');
+    const id = localStorage.getItem('userId');
+    
     setProfileImage(storedImage);
     setUsername(storedUsername);
   }, []);
@@ -40,6 +85,8 @@ export default function EndingPage() {
     }
   };
 
+  const correctAnswers = questions.filter(q => q.correct === "true").length;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 py-12 px-4">
       <motion.div
@@ -58,7 +105,7 @@ export default function EndingPage() {
                 fill
                 priority
                 sizes='w-full h-auto'
-                className=" rounded-full object-cover border-4 border-purple-500"
+                className="rounded-full object-cover border-4 border-purple-500"
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -86,42 +133,70 @@ export default function EndingPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-purple-50 p-4 rounded-lg text-center">
               <p className="text-gray-600">Story Score</p>
-              <p className="text-3xl font-bold text-purple-600">85%</p>
+              <p className="text-3xl font-bold text-purple-600">
+                {Math.round((correctAnswers / questions.length) * 100)}%
+              </p>
             </div>
             <div className="bg-pink-50 p-4 rounded-lg text-center">
               <p className="text-gray-600">Questions</p>
-              <p className="text-3xl font-bold text-pink-600">4/5</p>
+              <p className="text-3xl font-bold text-pink-600">
+                {correctAnswers}/{questions.length}
+              </p>
             </div>
           </div>
         </motion.div>
 
-        {/* Badges Section */}
+        {/* Achievements Section */}
         <motion.div variants={itemVariants}>
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Achievements</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-yellow-50 p-4 rounded-lg text-center">
-              <div className="w-16 h-16 mx-auto mb-2 bg-yellow-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🏆</span>
+          <div className="flex justify-center gap-8 mb-8">
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 relative mb-2">
+                <Image
+                  src="/logo/trophy.gif"
+                  alt="Trophy"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
               </div>
-              <p className="text-sm text-gray-600">Story Master</p>
+              <span className="text-sm text-gray-600">Perfect Score</span>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
-              <div className="w-16 h-16 mx-auto mb-2 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">⭐</span>
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 relative mb-2">
+                <Image
+                  src="/logo/star.gif"
+                  alt="Star"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
               </div>
-              <p className="text-sm text-gray-600">Quick Learner</p>
+              <span className="text-sm text-gray-600">Great Job</span>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
-              <div className="w-16 h-16 mx-auto mb-2 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🎯</span>
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 relative mb-2">
+                <Image
+                  src="/logo/bulleye.gif"
+                  alt="Bullseye"
+                  width={64}
+                  height={64}
+                  className="object-contain"
+                />
               </div>
-              <p className="text-sm text-gray-600">Perfect Score</p>
+              <span className="text-sm text-gray-600">On Target</span>
             </div>
           </div>
         </motion.div>
 
-        {/* Continue Button */}
-        <motion.div className="mt-8 text-center" variants={itemVariants}>
+        {/* Buttons */}
+        <motion.div className="mt-8 text-center space-y-4" variants={itemVariants}>
+          <SoundButton
+            onClick={() => setShowAnswers(true)}
+            className="bg-purple-600 text-white px-8 py-3 rounded-full hover:bg-purple-700 transition-colors mr-4"
+          >
+            View Your Answers
+          </SoundButton>
           <SoundButton
             onClick={() => router.push('/story2')}
             className="bg-purple-600 text-white px-8 py-3 rounded-full hover:bg-purple-700 transition-colors"
@@ -130,6 +205,13 @@ export default function EndingPage() {
           </SoundButton>
         </motion.div>
       </motion.div>
+
+      {/* Answers Popup */}
+      <AnswersPopup
+        isOpen={showAnswers}
+        onClose={() => setShowAnswers(false)}
+        questions={questions}
+      />
     </div>
   );
 } 

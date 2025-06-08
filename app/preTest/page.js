@@ -70,7 +70,7 @@ export default function PreTest() {
   };
 
   return (
-    <div className="h-full w-full bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50">
+    <div className="min-h-screen w-screen bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50">
       <div className="max-w-3xl mx-auto p-4 ">
         <Notification
           show={notif.show}
