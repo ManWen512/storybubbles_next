@@ -1,0 +1,20 @@
+import { authFetch } from '@/redux/lib/authFetch';
+import { NextResponse } from 'next/server';
+
+export async function GET(request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const testId = searchParams.get('testId');
+        const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+        const res = await authFetch(`${accUrl}/test?testId=${testId}`);
+        const data = await res.json();
+
+        return NextResponse.json(data);
+    } catch (err) {
+        return NextResponse.json(
+            { error: err.message || 'Failed to fetch test' },
+            { status: err.status || 500 }
+        );
+    }
+}

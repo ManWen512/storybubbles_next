@@ -1,10 +1,8 @@
-
-
 export const authFetch = async (url, options = {}) => {
     // 🔐 Hardcoded username and password
-    const username = process.env.NEXT_PUBLIC_USERNAME;
-    const password = process.env.NEXT_PUBLIC_PASSWORD;
-    const token = btoa(`${username}:${password}`);
+    const username = process.env.API_USERNAME;
+    const password = process.env.API_PASSWORD;
+    const token = Buffer.from(`${username}:${password}`).toString('base64');
   
     const res = await fetch(url, {
       ...options,
@@ -21,4 +19,3 @@ export const authFetch = async (url, options = {}) => {
   
     return res;
   };
-  
