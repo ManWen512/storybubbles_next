@@ -1,23 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { authFetch } from "../lib/authFetch";
+
+const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Fetch a specific story by ID
-export const fetchStory = createAsyncThunk("story/fetchStory", async ({id}) => {
-  const response = await fetch(`/api/story?storyId=${id}`);
-  const data = await response.json();
-  return { id, stories: data };
-});
+export const fetchStory = createAsyncThunk(
+  "story/fetchStory",
+  async (id) => {
+    const response = await authFetch(`${accUrl}/story?storyId=${id}`);
+    const data = await response.json();
+    return { id, stories: data };
+  }
+);
 
 // Submit an answer to the backend
 export const submitStoryAnswer = createAsyncThunk(
   "story/submitStoryAnswer",
   async ({ questionId, chosenAnswer, userId }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`/api/answer`, {
+      const response = await authFetch(`${accUrl}/answer`, {
         method: "POST",
         body: JSON.stringify({
           questionId,
           chosenAnswer,
-          userId,
+          user: { id: userId },
         }),
         headers: {
           "Content-Type": "application/json",

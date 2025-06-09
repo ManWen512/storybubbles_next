@@ -27,10 +27,10 @@ export default function AnswersPopup({ isOpen, onClose, questions }) {
           className="bg-gradient-to-b from-purple-100 to-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-white bg-opacity-90 p-6 border-b flex justify-between items-center">
+          <div className="sticky top-0 bg-white bg-opacity-100 p-6 border-b flex justify-between items-center z-10 shadow-sm">
             <div className="flex items-center gap-3">
               <FaTrophy className="text-yellow-500 text-2xl" />
-              <h2 className="text-2xl font-bold text-purple-800">Your Results!</h2>
+              <h2 className="text-2xl font-bold text-purple-800 font-quicksand">Your Results!</h2>
             </div>
             <button
               onClick={onClose}
@@ -60,7 +60,11 @@ export default function AnswersPopup({ isOpen, onClose, questions }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="mb-6 last:mb-0 bg-white rounded-xl p-4 shadow-sm"
+                className={`mb-6 last:mb-0 rounded-xl p-4 shadow-sm ${
+                  question.correct === "true" 
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-red-50 border border-red-200'
+                }`}
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -72,12 +76,12 @@ export default function AnswersPopup({ isOpen, onClose, questions }) {
                     }
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    <h3 className={`text-lg font-quicksand mb-2 text-black`}>
                       {question.questionText}
                     </h3>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 relative">
+                        <div className="w-6 h-6 relative z-0">
                           <Image
                             src="/logo/man.png"
                             alt="User"
@@ -86,13 +90,13 @@ export default function AnswersPopup({ isOpen, onClose, questions }) {
                             className="object-contain"
                           />
                         </div>
-                        <p className="text-gray-600">
+                        <p className={question.correct === "true" ? 'text-green-700' : 'text-red-700'}>
                           {question.userAnswerText}
                         </p>
                       </div>
                       {question.correct === "false" && (
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 relative">
+                          <div className="w-6 h-6 relative z-0">
                             <Image
                               src="/logo/check.png"
                               alt="Correct"
@@ -101,7 +105,7 @@ export default function AnswersPopup({ isOpen, onClose, questions }) {
                               className="object-contain"
                             />
                           </div>
-                          <p className="text-green-600">
+                          <p className="text-green-700">
                             {question.correctAnswerText}
                           </p>
                         </div>
@@ -114,7 +118,7 @@ export default function AnswersPopup({ isOpen, onClose, questions }) {
           </div>
 
           {/* Footer */}
-          <div className="sticky bottom-0 bg-white bg-opacity-90 p-6 border-t">
+          <div className="sticky bottom-0 bg-white bg-opacity-100 p-6 border-t z-10 shadow-sm">
             <div className="flex justify-between items-center">
               <div className="text-gray-600">
                 {correctCount} out of {totalQuestions} correct!

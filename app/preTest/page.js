@@ -31,10 +31,10 @@ export default function PreTest() {
     dispatch(fetchTest(1)); // 1 = preTest
   }, [dispatch]);
 
-  const handleChange = (questionId, choiceId) => {
+  const handleChange = (questionIndex, choiceIndex) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: choiceId,
+      [questionIndex]: choiceIndex,
     }));
   };
 
@@ -52,10 +52,10 @@ export default function PreTest() {
     const finalAnswers = { ...answers };
 
     // Set default answers for unanswered questions
-    preTest.forEach((question) => {
-      if (!finalAnswers[question.id]) {
-        // Set the first choice as default answer
-        finalAnswers[question.id] = question.choices[0].id;
+    preTest.forEach((question, questionIndex) => {
+      if (finalAnswers[questionIndex] === undefined) {
+        // Set the first choice (index 0) as default answer
+        finalAnswers[questionIndex] = 0;
       }
     });
 
@@ -96,26 +96,26 @@ export default function PreTest() {
           ""
         )}
         <form onSubmit={handleSubmit}>
-          {preTest.map((q) => (
-            <div key={q.id} className="mb-6">
+          {preTest.map((q, questionIndex) => (
+            <div key={questionIndex} className="mb-6">
               <h2 className="text-lg font-quicksand mb-2">
-                {q.id}. {q.questionText}
+                {questionIndex + 1}. {q.questionText}
               </h2>
               <div className="grid grid-cols-5 gap-1 place-items-center">
-                {q.choices.map((choice, index) => (
+                {q.choices.map((choice, choiceIndex) => (
                   <label
-                    key={index}
+                    key={choiceIndex}
                     className={`cursor-pointer flex items-center gap-2 rounded-xl px-4 py-2 transition hover:bg-purple-300 ${
-                      answers[q.id] === choice.id
+                      answers[questionIndex] === choiceIndex
                         ? "bg-purple-300 border-purple-400 border-2"
                         : "border-gray-300"
                     }`}
                   >
                     <input
                       type="radio"
-                      name={`question-${q.id}`}
-                      value={choice.id}
-                      onChange={() => handleChange(q.id, choice.id)}
+                      name={`question-${questionIndex}`}
+                      value={choiceIndex}
+                      onChange={() => handleChange(questionIndex, choiceIndex)}
                       className="hidden"
                     />
                     <div className="grid grid-cols-1 grid-rows-2 gap-2 place-items-center">

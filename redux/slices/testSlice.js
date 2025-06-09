@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { authFetch } from "../lib/authFetch";
+
+const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Fetch Test Questions (Pre = 1, Post = 2)
 export const fetchTest = createAsyncThunk(
   "test/fetchTest",
   async (id) => {
-    const response = await fetch(`/api/test?testId=${id}`);
+    const response = await authFetch(`${accUrl}/test?testId=${id}`);
     const data = await response.json();
     return { id, questions: data.questions };
   }
@@ -20,7 +23,7 @@ export const submitTestAnswers = createAsyncThunk(
         questionsAnswers: answers, // send as-is: { "1": 3, "2": 4 }
       };
 
-      const response = await fetch(`/api/submit_test`, {
+      const response = await authFetch(`${accUrl}/answer/test-answers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,7 +31,7 @@ export const submitTestAnswers = createAsyncThunk(
         body: JSON.stringify(payload),
       });
 
-      console.log(payload)
+    
 
       if (!response.ok) {
         const errorData = await response.json();

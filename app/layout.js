@@ -1,5 +1,5 @@
 import ClickSpark from "./components/clickSpark";
-import SplashCursor from "./components/splashCursor";
+
 import "./globals.css";
 import { Providers } from "./provider";
 

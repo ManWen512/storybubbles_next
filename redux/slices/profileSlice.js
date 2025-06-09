@@ -1,11 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authFetch } from '../lib/authFetch';
+
+const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Fetch profile images
 export const fetchProfileImages = createAsyncThunk(
   'profile/fetchProfileImages',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch(`/api/profile_images`);
+      const res = await authFetch(`${accUrl}/user/profile-images`);
       const data = await res.json();
       return data;
     } catch (err) {
@@ -19,7 +22,7 @@ export const createUser = createAsyncThunk(
   'profile/createUser',
   async ({ username, profileImage }, { rejectWithValue }) => {
     try {
-      const res = await fetch(`/api/create_user`, {
+      const res = await authFetch(`${accUrl}/user/create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import SplashCursor from "./components/splashCursor";
+
 import BouncingLogo from "./components/bouncingLogo";
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen">
-      {/* <SplashCursor/> */}
+      
       {/* Main background */}
       <div
         className="absolute inset-0 bg-cover bg-center flex  justify-center"

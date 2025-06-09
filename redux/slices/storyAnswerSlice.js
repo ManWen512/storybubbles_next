@@ -1,41 +1,45 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { authFetch } from '../lib/authFetch';
 
+const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Fetch a specific story by ID
 export const fetchStoryAnswer = createAsyncThunk(
     "story/fetchStoryAnswer",
     async ({ storyId, userId }) => {
-        const response = await fetch(`/api/story-answer?userId=${userId}&storyId=${storyId}`);
+        const response = await fetch(`${accUrl}/answer/story-answer?userId=${userId}&storyId=${storyId}`);
         const data = await response.json();
-        return { answerLists: data.answerLists };
+        return { 
+            storyId, 
+            answersList: data.answersList,
+            correctCount: data.correctCount 
+        };
     });
 
 const storyAnswerSlice = createSlice({
     name: "storyAnswer",
     initialState: {
-        storyOne: [],
-        storytwo: [],
-        storythree: [],
+        currentStoryId: null,
+        storyAnswers: {},
         error: null,
         status: "idle",
-
     },
-    reducers: {},
+    reducers: {
+        setCurrentStoryId: (state, action) => {
+            state.currentStoryId = action.payload;
+        }
+    },
     extraReducers: (builder) => {
         builder
-            // Fetch story logic
             .addCase(fetchStoryAnswer.pending, (state) => {
                 state.status = "loading";
             })
             .addCase(fetchStoryAnswer.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                if (action.payload.id === 1) {
-                    state.storyAnswerOne = action.payload.answerLists;
-                } else if (action.payload.id === 2) {
-                    state.storyAnswerTwo = action.payload.answerLists;
-                } else if (action.payload.id === 3) {
-                    state.storyAnswerThree = action.payload.answerLists;
-                }
+                state.storyAnswers[action.payload.storyId] = {
+                    answersList: action.payload.answersList,
+                    correctCount: action.payload.correctCount
+                };
             })
             .addCase(fetchStoryAnswer.rejected, (state, action) => {
                 state.status = "failed";
@@ -44,4 +48,5 @@ const storyAnswerSlice = createSlice({
     }
 })
 
+export const { setCurrentStoryId } = storyAnswerSlice.actions;
 export default storyAnswerSlice.reducer;
