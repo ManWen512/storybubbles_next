@@ -7,7 +7,7 @@ const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const fetchStoryAnswer = createAsyncThunk(
     "story/fetchStoryAnswer",
     async ({ storyId, userId }) => {
-        const response = await fetch(`${accUrl}/answer/story-answer?userId=${userId}&storyId=${storyId}`);
+        const response = await authFetch(`${accUrl}/answer/story-answer?userId=${userId}&storyId=${storyId}`);
         const data = await response.json();
         return { 
             storyId, 
