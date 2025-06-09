@@ -23,7 +23,7 @@ export const submitStoryAnswer = createAsyncThunk(
         body: JSON.stringify({
           questionId,
           chosenAnswer,
-          user: { id: userId },
+          userId,
         }),
         headers: {
           "Content-Type": "application/json",

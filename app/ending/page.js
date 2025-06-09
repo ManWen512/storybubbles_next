@@ -81,7 +81,7 @@ export default function EndingPage() {
     },
   };
 
-  const correctAnswers = questions.filter((q) => q.correct === "true").length;
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 py-12 px-4 font-quicksand">
@@ -132,7 +132,7 @@ export default function EndingPage() {
           <p className="text-gray-600">{currentStoryId}/3 Stories Completed</p>
         </motion.div>
         {status === "failed" ? (
-          <p className="text-center text-red-500">Failed to load questions.</p>
+          <p className="text-center text-red-500">Failed to load Answers.</p>
         ) : (
           ""
         )}
