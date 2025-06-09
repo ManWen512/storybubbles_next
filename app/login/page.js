@@ -86,7 +86,7 @@ export default function ProfilePage() {
       )}
       {error && <p className="text-red-500">Error: {error}</p>}
       <div className="flex justify-center">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 place-items-center">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 place-items-center">
           {images.map((img, index) => (
             <div
               key={index}

@@ -210,14 +210,17 @@ export default function StoryOne() {
   };
 
   const handleContinue = () => {
+    
     setShowContinue(false);
 
     if (activeDialogueIndex < currentScene.dialogues.length - 1) {
       // Move to next dialogue in current scene
       setActiveDialogueIndex((prev) => prev + 1);
+      setTimeout(()=>{},500);
     } else if (currentSceneIndex < storyOne.scenes.length - 1) {
       // Move to next scene
       setCurrentSceneIndex((prev) => prev + 1);
+      setTimeout(()=>{},500);
     } else {
       showNotification("Story completed! Redirecting to results...", "success");
       // Stop background music when story ends
@@ -227,7 +230,7 @@ export default function StoryOne() {
       // Redirect to ending page after a short delay
       setTimeout(() => {
         router.push('/ending');
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -292,7 +295,7 @@ export default function StoryOne() {
         >
           {/* Scene title */}
           <h2 className="text-2xl font-quicksand font-bold text-center mb-4">
-            {currentScene.name}
+            {currentScene.name }
           </h2>
 
           {/* Story image */}

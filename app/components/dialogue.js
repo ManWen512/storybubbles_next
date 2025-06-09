@@ -64,7 +64,7 @@ export default function Dialogue({
 
     let currentIndex = 0;
     const textLength = text.length;
-    const typingSpeed = 30; // milliseconds per character
+    const typingSpeed = 60; // milliseconds per character
 
     // Start audio playback
     const startAudio = () => {
@@ -111,7 +111,7 @@ export default function Dialogue({
       className="relative bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto mb-4"
     >
       <div className="flex items-start">
-        <p className="text-lg flex-1 font-quicksand">
+        <p className="text-xl flex-1 font-quicksand">
           {displayedText}
           {isTyping && <span className="animate-blink">|</span>}
         </p>

@@ -132,7 +132,7 @@ export default function QuestionTask({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + (index * 0.1) }}
                   onClick={() => !answered && setSelectedAnswer(index )}
-                  className={`justify-between items-center flex font-quicksand px-3 py-5 border-2 rounded-2xl cursor-pointer transition-colors hover:border-purple-400 
+                  className={`justify-center items-center flex font-bold font-quicksand px-3 py-5 border-2 rounded-2xl cursor-pointer transition-colors hover:border-purple-400 
                     ${selectedAnswer === index  ? 'border-2 border-purple-500 bg-purple-50' : 'border-gray-300'}
                     ${showResult && index  === correctAnswerIndex ? 'bg-green-100 border-green-500' : ''}
                     ${showResult && selectedAnswer === index  && selectedAnswer !== correctAnswerIndex ? 'bg-red-100 border-red-400' : ''}
@@ -140,7 +140,7 @@ export default function QuestionTask({
                   `}
                 >
                   {choice?.label || `Option ${index + 1}`}
-                  <span><img src={choice.emoji} alt='Choice Emoji' className='w-10 h-10 rounded-xl'/></span>
+                  {/* <span><img src={choice.emoji} alt='Choice Emoji' className='w-10 h-10 rounded-xl'/></span> */}
                 </motion.div>
               ))}
             </div>
