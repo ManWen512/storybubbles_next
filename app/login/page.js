@@ -54,11 +54,11 @@ export default function ProfilePage() {
           localStorage.setItem("username", username);
         }
         showNotification("User successfully created!", "success");
-        
+
         // Check if there's a redirect URL stored
-        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        const redirectUrl = localStorage.getItem("redirectAfterLogin");
         if (redirectUrl) {
-          localStorage.removeItem('redirectAfterLogin'); // Clean up
+          localStorage.removeItem("redirectAfterLogin"); // Clean up
           router.push(redirectUrl);
         } else {
           router.push("/preTest");
@@ -77,38 +77,40 @@ export default function ProfilePage() {
         type={notif.type}
         onClose={() => setNotif({ ...notif, show: false })}
       />
-      <h1 className="text-xl font-quicksand dark font-bold mb-4">Profile Images</h1>
-
-      {loading && (
+      <h1 className="text-xl font-quicksand dark font-bold mb-4">
+        Profile Images
+      </h1>
+      {error && <p className="text-red-500">Error: {error}</p>}
+      {loading ? (
         <div className="flex items-center justify-center">
           <LoadingScreen />
         </div>
-      )}
-      {error && <p className="text-red-500">Error: {error}</p>}
-      <div className="flex justify-center">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 place-items-center">
-          {images.map((img, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedIndex(index)}
-              className={`relative w-36 h-36 xl:w-40 xl:h-40 2xl:w-52 2xl:h-52 rounded-2xl shadow cursor-pointer transition duration-200 ${
-                selectedIndex === index
-                  ? "ring-4 ring-purple-400"
-                  : "hover:ring-2 hover:ring-gray-300"
-              }`}
-            >
-              <Image
-                src={img}
-                alt={`Profile ${index}`}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="rounded-2xl object-cover"
-              />
-            </div>
-          ))}
+      ) : (
+        <div className="flex justify-center">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 place-items-center">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                onClick={() => setSelectedIndex(index)}
+                className={`relative w-36 h-36 xl:w-40 xl:h-40 2xl:w-52 2xl:h-52 rounded-2xl shadow cursor-pointer transition duration-200 ${
+                  selectedIndex === index
+                    ? "ring-4 ring-purple-400"
+                    : "hover:ring-2 hover:ring-gray-300"
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`Profile ${index}`}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="rounded-2xl object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex justify-center mt-8">
         <input
           type="text"

@@ -13,37 +13,6 @@ export const fetchTest = createAsyncThunk(
   }
 );
 
-// Submit Test Answers (Pre/Post)
-export const submitTestAnswers = createAsyncThunk(
-  "test/submitTestAnswers",
-  async ({ userId, answers }, { rejectWithValue }) => {
-    try {
-      const payload = {
-        userId,
-        questionsAnswers: answers, // send as-is: { "1": 3, "2": 4 }
-      };
-
-      const response = await authFetch(`${accUrl}/answer/test-answers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-    
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to submit test answers");
-      }
-
-      return await response.json();
-    } catch (err) {
-      return rejectWithValue(err.message);
-    }
-  }
-);
 
 const testSlice = createSlice({
   name: "test",
@@ -74,17 +43,7 @@ const testSlice = createSlice({
         state.error = action.error.message;
       })
 
-      // Submitting answers
-      .addCase(submitTestAnswers.pending, (state) => {
-        state.submissionStatus = "loading";
-      })
-      .addCase(submitTestAnswers.fulfilled, (state) => {
-        state.submissionStatus = "succeeded";
-      })
-      .addCase(submitTestAnswers.rejected, (state, action) => {
-        state.submissionStatus = "failed";
-        state.error = action.payload || "Submission failed";
-      });
+     
   },
 });
 

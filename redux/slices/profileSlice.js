@@ -1,43 +1,55 @@
+// redux/slices/profileSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { authFetch } from '../lib/authFetch';
 
-const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-// Fetch profile images
+// Fetch profile images from Notion
 export const fetchProfileImages = createAsyncThunk(
-  'profile/fetchProfileImages',
+  'profile/fetchImages',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await authFetch(`${accUrl}/user/profile-images`);
-      const data = await res.json();
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.message);
+      const response = await fetch('/api/profile-images');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch images');
+      }
+      
+      return data.images; // Return the array of image URLs
+
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// Create user
 export const createUser = createAsyncThunk(
   'profile/createUser',
   async ({ username, profileImage }, { rejectWithValue }) => {
     try {
-      const res = await authFetch(`${accUrl}/user/create-user`, {
+      const response = await fetch('/api/create-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, profileImage }),
+        body: JSON.stringify({
+          username,
+          profileImage
+        }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to create user');
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.error || 'Failed to create user');
       }
 
-      return await res.json();
-    } catch (err) {
-      return rejectWithValue(err.message);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -48,13 +60,14 @@ const profileSlice = createSlice({
     images: [],
     loading: false,
     error: null,
-    createStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-    createError: null,
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      // Fetch profile images
       .addCase(fetchProfileImages.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -62,25 +75,29 @@ const profileSlice = createSlice({
       .addCase(fetchProfileImages.fulfilled, (state, action) => {
         state.loading = false;
         state.images = action.payload;
+        state.error = null;
       })
       .addCase(fetchProfileImages.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message;
+        state.error = action.payload;
+        state.images = [];
       })
-
-      // Create user
+      // Add cases for createUser
       .addCase(createUser.pending, (state) => {
-        state.createStatus = 'loading';
-        state.createError = null;
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(createUser.fulfilled, (state) => {
-        state.createStatus = 'succeeded';
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        // Optionally, you can handle user data here if needed
       })
       .addCase(createUser.rejected, (state, action) => {
-        state.createStatus = 'failed';
-        state.createError = action.payload || action.error.message;
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
+export const { clearError } = profileSlice.actions;
 export default profileSlice.reducer;

@@ -1,8 +1,6 @@
 // app/story-one/page.jsx
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchStory } from "@/redux/slices/storySlice";
 import StartScreen from "../components/startScreen";
 import StoryImage from "../components/storyImage";
 import Dialogue from "../components/dialogue";
@@ -14,13 +12,17 @@ import LoadingScreen from "../components/loadingScreen";
 import Notification from "../components/notification";
 import ProgressBar from "../components/progressBar";
 import { useRouter } from "next/navigation";
+import { setCurrentStoryName } from "@/redux/slices/storyAnswerSlice";
+import { useDispatch } from "react-redux";
+
 
 export default function StoryOne() {
-  const dispatch = useDispatch();
-  const { storyOne, status } = useSelector((state) => state.story);
+  const [storyData, setStoryData] = useState(null);
+  const [status, setStatus] = useState("idle");
   const [bgMusic, setBgMusic] = useState(null);
   const [narrativeSound, setNarrativeSound] = useState(null);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   // Update page title
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function StoryOne() {
   const [activeDialogueIndex, setActiveDialogueIndex] = useState(0);
   const [showContinue, setShowContinue] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
+  const selectedStoryName = "The Forest";
   const [currentQuestionState, setCurrentQuestionState] = useState({
     index: 0,
     answered: false,
@@ -51,11 +54,62 @@ export default function StoryOne() {
     setNotif({ show: true, message, type });
   };
 
+useEffect(() => {
+  dispatch(setCurrentStoryName(selectedStoryName));
+}, [dispatch, selectedStoryName]);
+
+  // Fetch story data from Notion
+useEffect(() => {
+  async function fetchNotionData() {
+    try {
+      setStatus("loading");
+      const res = await fetch("/api/notion");
+      const data = await res.json();
+
+      // Find the specific story by name
+      const selectedStory = data.find((story) => story.name === selectedStoryName);
+
+      if (selectedStory) {
+        // Transform the data to match your existing structure
+        const transformedData = {
+          story: {
+            bgMusic: selectedStory.bgMusic,
+          },
+          scenes: selectedStory.scenes.map((scene) => ({
+            ...scene,
+            // Transform dialogues to match expected structure
+            dialogues: scene.dialogues ? scene.dialogues.map(d => d.text) : [],
+            dialogueSounds: scene.dialogues ? scene.dialogues.map(d => d.sound) : [],
+            dialogueTimestamps: scene.dialogues ? scene.dialogues.map(d => d.timestamps || []) : [],
+            // Ensure questions have the correct structure
+            questions: scene.questions ? scene.questions.map((question) => ({
+              ...question,
+              choices: question.choices || [],
+            })) : [],
+          })),
+        };
+
+        setStoryData(transformedData);
+        setStatus("succeeded");
+      } else {
+        throw new Error(`Story "${selectedStoryName}" not found`);
+      }
+    } catch (error) {
+      console.error("Fetch failed:", error);
+      setStatus("failed");
+      showNotification(`Failed to load story: ${selectedStoryName}`, "error");
+    }
+  }
+
+  fetchNotionData();
+  
+}, [selectedStoryName]);
+
   // Initialize background music
   useEffect(() => {
-    if (storyOne?.story?.bgMusic) {
+    if (storyData?.story?.bgMusic) {
       const music = new Howl({
-        src: [storyOne.story.bgMusic],
+        src: [storyData.story.bgMusic],
         loop: true,
         volume: 0.5,
         html5: true,
@@ -73,13 +127,13 @@ export default function StoryOne() {
       });
       setBgMusic(music);
     }
-  }, [storyOne]);
+  }, [storyData]);
 
   // Initialize narrative sound
   useEffect(() => {
-    if (!storyOne?.scenes?.[currentSceneIndex]) return;
+    if (!storyData?.scenes?.[currentSceneIndex]) return;
 
-    const scene = storyOne.scenes[currentSceneIndex];
+    const scene = storyData.scenes[currentSceneIndex];
     if (scene?.dialogueSounds?.[activeDialogueIndex]) {
       const sound = new Howl({
         src: [scene.dialogueSounds[activeDialogueIndex]],
@@ -88,7 +142,7 @@ export default function StoryOne() {
       });
       setNarrativeSound(sound);
     }
-  }, [storyOne, currentSceneIndex, activeDialogueIndex]);
+  }, [storyData, currentSceneIndex, activeDialogueIndex]);
 
   // Handle background music when story starts/stops
   useEffect(() => {
@@ -116,8 +170,8 @@ export default function StoryOne() {
 
   // Preload all audio files when story data loads
   useEffect(() => {
-    if (storyOne?.scenes) {
-      storyOne.scenes.forEach((scene) => {
+    if (storyData?.scenes) {
+      storyData.scenes.forEach((scene) => {
         scene.dialogueSounds?.forEach((url) => {
           new Howl({
             src: [url],
@@ -127,12 +181,21 @@ export default function StoryOne() {
         });
       });
     }
-  }, [storyOne]);
+    
+  }, [storyData]);
 
-  // Fetch story data
   useEffect(() => {
-    dispatch(fetchStory(1));
-  }, [dispatch]);
+  if (!storyData?.scenes) return;
+
+  const nextScenes = storyData.scenes.slice(currentSceneIndex + 1, currentSceneIndex + 3);
+  nextScenes.forEach((scene) => {
+    if (scene.pictures) {
+      const img = new Image();
+      img.src = scene.pictures; // browser caches it
+    }
+  });
+}, [currentSceneIndex, storyData]);
+
 
   // Auto-scroll to bottom when content changes
   const scrollToBottom = () => {
@@ -183,7 +246,7 @@ export default function StoryOne() {
     );
   }
 
-  if (!storyOne || !storyOne.scenes) {
+  if (status === "failed" || !storyData || !storyData.scenes) {
     return (
       <div className="flex items-center justify-center">
         <LoadingScreen />
@@ -191,7 +254,7 @@ export default function StoryOne() {
     );
   }
 
-  const currentScene = storyOne.scenes[currentSceneIndex];
+  const currentScene = storyData.scenes[currentSceneIndex];
 
   const handleStart = () => {
     setStarted(true);
@@ -210,17 +273,16 @@ export default function StoryOne() {
   };
 
   const handleContinue = () => {
-    
     setShowContinue(false);
 
     if (activeDialogueIndex < currentScene.dialogues.length - 1) {
       // Move to next dialogue in current scene
       setActiveDialogueIndex((prev) => prev + 1);
-      setTimeout(()=>{},500);
-    } else if (currentSceneIndex < storyOne.scenes.length - 1) {
+      setTimeout(() => {}, 500);
+    } else if (currentSceneIndex < storyData.scenes.length - 1) {
       // Move to next scene
       setCurrentSceneIndex((prev) => prev + 1);
-      setTimeout(()=>{},500);
+      setTimeout(() => {}, 500);
     } else {
       showNotification("Story completed! Redirecting to results...", "success");
       // Stop background music when story ends
@@ -229,7 +291,7 @@ export default function StoryOne() {
       }
       // Redirect to ending page after a short delay
       setTimeout(() => {
-        router.push('/ending');
+        router.push("/ending");
       }, 500);
     }
   };
@@ -255,18 +317,18 @@ export default function StoryOne() {
         setShowQuestion(false);
         setShowContinue(true);
       }
-    }, 2500); // 1.5 second delay before moving to next question
+    }, 2500); // 2.5 second delay before moving to next question
   };
 
   if (!started) {
-    return <StartScreen onStart={handleStart} />;
+    return <StartScreen onStart={handleStart} storyName={selectedStoryName}/>;
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50 py-8">
       {/* Audio Controls - Moved outside AnimatePresence */}
       {started && bgMusic && <AudioControls bgMusic={bgMusic} />}
-      
+
       <Notification
         show={notif.show}
         message={notif.message}
@@ -277,9 +339,9 @@ export default function StoryOne() {
       {/* Progress Bar */}
       {started && (
         <div className="container mx-auto px-3 mb-4">
-          <ProgressBar 
-            currentScene={currentSceneIndex } 
-            totalScenes={storyOne.scenes.length} 
+          <ProgressBar
+            currentScene={currentSceneIndex}
+            totalScenes={storyData.scenes.length}
           />
         </div>
       )}
@@ -295,7 +357,7 @@ export default function StoryOne() {
         >
           {/* Scene title */}
           <h2 className="text-2xl font-quicksand font-bold text-center mb-4">
-            {currentScene.name }
+            {currentScene.name}
           </h2>
 
           {/* Story image */}
@@ -306,7 +368,7 @@ export default function StoryOne() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <StoryImage imageUrl={currentScene.pictures[0]} />
+              <StoryImage imageUrl={currentScene.pictures} />
             </motion.div>
           )}
 
@@ -319,6 +381,9 @@ export default function StoryOne() {
               transition={{ duration: 0.4 }}
             >
               <Dialogue
+                transcript={
+                  currentScene.dialogueTimestamps?.[activeDialogueIndex] || []
+                }
                 text={currentScene.dialogues[activeDialogueIndex]}
                 audioUrl={currentScene.dialogueSounds?.[activeDialogueIndex]}
                 onAudioEnd={handleDialogueComplete}

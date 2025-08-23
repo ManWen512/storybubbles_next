@@ -13,33 +13,30 @@ export const fetchStory = createAsyncThunk(
   }
 );
 
-// Submit an answer to the backend
+// redux/slices/storySlice.js
 export const submitStoryAnswer = createAsyncThunk(
-  "story/submitStoryAnswer",
-  async ({ questionId, chosenAnswer, userId }, { rejectWithValue }) => {
-    try {
-      const response = await authFetch(`${accUrl}/answer`, {
-        method: "POST",
-        body: JSON.stringify({
-          questionId,
-          chosenAnswer,
-          userId,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  'story/submitAnswer',
+  async ({ username, storyName, question, chosenAnswer, isCorrect, correctAnswer }) => {
+    const response = await fetch('/api/save-answer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        storyName,
+        question,
+        chosenAnswer,
+        isCorrect, 
+        correctAnswer,
+      }),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        return rejectWithValue(errorData);
-      }
-
-      const result = await response.json();
-      return result; // return the saved answer response
-    } catch (error) {
-      return rejectWithValue(error.message);
+    if (!response.ok) {
+      throw new Error('Failed to save answer');
     }
+
+    return await response.json();
   }
 );
 

@@ -1,109 +1,119 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { authFetch } from '../lib/authFetch';
 
-const accUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-// Fetch a specific story by ID
+// Fetch answers for the current story only
 export const fetchStoryAnswer = createAsyncThunk(
-    "story/fetchStoryAnswer",
-    async ({ storyId, userId }, { rejectWithValue }) => {
-        try {
-            const response = await authFetch(`${accUrl}/answer/story-answers?userId=${userId}&storyId=${storyId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (!data || !Array.isArray(data.answersList)) {
-                throw new Error('Invalid response format');
-            }
+  "story/fetchStoryAnswer",
+  async ({ storyName, username }, { rejectWithValue }) => {
+    try {
+      const response = await fetch("/api/answers", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-            return { 
-                storyId, 
-                answersList: data.answersList,
-                correctCount: data.correctCount || 0
-            };
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("API Response:", data);
+
+      if (!data.success || !Array.isArray(data.data)) {
+        throw new Error("Invalid response format");
+      }
+
+      // Filter answers for the specific story and username
+      let filteredAnswers = data.data.filter(
+        (answer) =>
+          answer.storyName === storyName && answer.username === username
+      );
+
+      // Process the answers into the expected format
+      const answersList = filteredAnswers.map((answer, index) => ({
+        questionIndex: index,
+        userAnswerText: answer.chosenAnswer,
+        question: answer.question,
+        correctAnswer: answer.correctAnswer,
+        createdTime: answer.created_time,
+        username: answer.username,
+      }));
+
+      return {
+        storyName,
+        username,
+        answersList,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
+  }
 );
 
 const storyAnswerSlice = createSlice({
-    name: "storyAnswer",
-    initialState: {
-        currentStoryId: null,
-        storyAnswers: {},
-        error: null,
-        status: "idle",
-        totalCorrectCount: 0
+  name: "storyAnswer",
+  initialState: {
+    currentStoryName: null,
+    currentUsername: null,
+    currentStoryAnswers: null, // Only store current story data
+    error: null,
+    status: "idle",
+  },
+  reducers: {
+    setCurrentStoryName: (state, action) => {
+      state.currentStoryName = action.payload;
     },
-    reducers: {
-        setCurrentStoryId: (state, action) => {
-            state.currentStoryId = action.payload;
-        },
-        clearStoryAnswers: (state) => {
-            state.storyAnswers = {};
-            state.error = null;
-            state.status = "idle";
-            state.totalCorrectCount = 0;
-        },
-        clearCurrentStory: (state) => {
-            if (state.currentStoryId) {
-                delete state.storyAnswers[state.currentStoryId];
-                state.currentStoryId = null;
-            }
-        },
-        updateAnswer: (state, action) => {
-            const { storyId, questionIndex, answer, isCorrect } = action.payload;
-            if (state.storyAnswers[storyId]) {
-                state.storyAnswers[storyId].answersList[questionIndex] = {
-                    ...state.storyAnswers[storyId].answersList[questionIndex],
-                    userAnswerText: answer,
-                    correct: isCorrect.toString()
-                };
-                // Update correct count
-                state.storyAnswers[storyId].correctCount = state.storyAnswers[storyId].answersList.filter(
-                    answer => answer.correct === "true"
-                ).length;
-                // Update total correct count
-                state.totalCorrectCount = Object.values(state.storyAnswers).reduce(
-                    (total, story) => total + story.correctCount, 0
-                );
-            }
-        }
+    setCurrentUsername: (state, action) => {
+      state.currentUsername = action.payload;
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchStoryAnswer.pending, (state) => {
-                state.status = "loading";
-                state.error = null;
-            })
-            .addCase(fetchStoryAnswer.fulfilled, (state, action) => {
-                state.status = "succeeded";
-                state.storyAnswers[action.payload.storyId] = {
-                    answersList: action.payload.answersList,
-                    correctCount: action.payload.correctCount
-                };
-                // Update total correct count
-                state.totalCorrectCount = Object.values(state.storyAnswers).reduce(
-                    (total, story) => total + story.correctCount, 0
-                );
-            })
-            .addCase(fetchStoryAnswer.rejected, (state, action) => {
-                state.status = "failed";
-                state.error = action.payload || "Failed to fetch story answers";
-            });
-    }
+    clearCurrentStory: (state) => {
+      state.currentStoryAnswers = null;
+      state.currentStoryName = null;
+      state.currentUsername = null;
+      state.error = null;
+      state.status = "idle";
+    },
+    updateAnswer: (state, action) => {
+      const { questionIndex, answer, isCorrect } = action.payload;
+      if (
+        state.currentStoryAnswers &&
+        state.currentStoryAnswers.answersList[questionIndex]
+      ) {
+        state.currentStoryAnswers.answersList[questionIndex] = {
+          ...state.currentStoryAnswers.answersList[questionIndex],
+          userAnswerText: answer,
+        };
+      }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchStoryAnswer.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchStoryAnswer.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const { storyName, username, answersList } = action.payload;
+
+        // Only store the current story data
+        state.currentStoryAnswers = {
+          answersList,
+        };
+        state.currentUsername = username;
+      })
+      .addCase(fetchStoryAnswer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to fetch story answers";
+      });
+  },
 });
 
-export const { 
-    setCurrentStoryId, 
-    clearStoryAnswers, 
-    clearCurrentStory,
-    updateAnswer 
+export const {
+  setCurrentStoryName,
+  setCurrentUsername,
+  clearCurrentStory,
+  updateAnswer,
 } = storyAnswerSlice.actions;
 
 export default storyAnswerSlice.reducer;

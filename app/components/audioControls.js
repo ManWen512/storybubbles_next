@@ -86,7 +86,7 @@ export default function AudioControls({ bgMusic }) {
         step="0.1"
         value={volume}
         onChange={handleVolumeChange}
-        className=" accent-purple-500  w-full"
+        className=" accent-purple-500  w-full "
       />
     </motion.div>
   );

@@ -1,0 +1,169 @@
+{
+  "segments": [
+    {
+      "start": 0.031,
+      "end": 5.282,
+      "text": " Milo, the friendly boy, lived in a colorful forest filled with magical creatures.",
+      "words": [
+        {
+          "word": "Milo,",
+          "start": 0.031,
+          "end": 0.576,
+          "score": 0.901
+        },
+        {
+          "word": "the",
+          "start": 0.839,
+          "end": 0.92,
+          "score": 1.0
+        },
+        {
+          "word": "friendly",
+          "start": 0.96,
+          "end": 1.344,
+          "score": 0.787
+        },
+        {
+          "word": "boy,",
+          "start": 1.425,
+          "end": 1.748,
+          "score": 0.843
+        },
+        {
+          "word": "lived",
+          "start": 1.808,
+          "end": 2.131,
+          "score": 0.852
+        },
+        {
+          "word": "in",
+          "start": 2.192,
+          "end": 2.232,
+          "score": 1.0
+        },
+        {
+          "word": "a",
+          "start": 2.293,
+          "end": 2.313,
+          "score": 0.999
+        },
+        {
+          "word": "colorful",
+          "start": 2.394,
+          "end": 2.838,
+          "score": 0.845
+        },
+        {
+          "word": "forest",
+          "start": 2.919,
+          "end": 3.363,
+          "score": 0.835
+        },
+        {
+          "word": "filled",
+          "start": 3.424,
+          "end": 3.707,
+          "score": 0.805
+        },
+        {
+          "word": "with",
+          "start": 3.788,
+          "end": 3.929,
+          "score": 0.866
+        },
+        {
+          "word": "magical",
+          "start": 4.05,
+          "end": 4.474,
+          "score": 0.977
+        },
+        {
+          "word": "creatures.",
+          "start": 4.555,
+          "end": 5.282,
+          "score": 0.934
+        }
+      ]
+    }
+  ],
+  "word_segments": [
+    {
+      "word": "Milo,",
+      "start": 0.031,
+      "end": 0.576,
+      "score": 0.901
+    },
+    {
+      "word": "the",
+      "start": 0.839,
+      "end": 0.92,
+      "score": 1.0
+    },
+    {
+      "word": "friendly",
+      "start": 0.96,
+      "end": 1.344,
+      "score": 0.787
+    },
+    {
+      "word": "boy,",
+      "start": 1.425,
+      "end": 1.748,
+      "score": 0.843
+    },
+    {
+      "word": "lived",
+      "start": 1.808,
+      "end": 2.131,
+      "score": 0.852
+    },
+    {
+      "word": "in",
+      "start": 2.192,
+      "end": 2.232,
+      "score": 1.0
+    },
+    {
+      "word": "a",
+      "start": 2.293,
+      "end": 2.313,
+      "score": 0.999
+    },
+    {
+      "word": "colorful",
+      "start": 2.394,
+      "end": 2.838,
+      "score": 0.845
+    },
+    {
+      "word": "forest",
+      "start": 2.919,
+      "end": 3.363,
+      "score": 0.835
+    },
+    {
+      "word": "filled",
+      "start": 3.424,
+      "end": 3.707,
+      "score": 0.805
+    },
+    {
+      "word": "with",
+      "start": 3.788,
+      "end": 3.929,
+      "score": 0.866
+    },
+    {
+      "word": "magical",
+      "start": 4.05,
+      "end": 4.474,
+      "score": 0.977
+    },
+    {
+      "word": "creatures.",
+      "start": 4.555,
+      "end": 5.282,
+      "score": 0.934
+    }
+  ]
+}
