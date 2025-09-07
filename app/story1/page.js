@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 import { setCurrentStoryName } from "@/redux/slices/storyAnswerSlice";
 import { useDispatch } from "react-redux";
 
-
 export default function StoryOne() {
   const [storyData, setStoryData] = useState(null);
   const [status, setStatus] = useState("idle");
@@ -54,56 +53,82 @@ export default function StoryOne() {
     setNotif({ show: true, message, type });
   };
 
-useEffect(() => {
-  dispatch(setCurrentStoryName(selectedStoryName));
-}, [dispatch, selectedStoryName]);
+  // Helper function to calculate cumulative question number
+  const getCumulativeQuestionNumber = () => {
+    let cumulativeQuestions = 0;
+
+    // Count all questions from previous scenes
+    for (let i = 0; i < currentSceneIndex; i++) {
+      cumulativeQuestions += storyData?.scenes?.[i]?.questions?.length || 0;
+    }
+
+    // Add current question index within current scene
+    cumulativeQuestions += currentQuestionState.index + 1;
+
+    return cumulativeQuestions;
+  };
 
   // Fetch story data from Notion
-useEffect(() => {
-  async function fetchNotionData() {
-    try {
-      setStatus("loading");
-      const res = await fetch("/api/notion");
-      const data = await res.json();
+  useEffect(() => {
+    async function fetchNotionData() {
+      try {
+        setStatus("loading");
+        const res = await fetch("/api/notion");
+        const data = await res.json();
 
-      // Find the specific story by name
-      const selectedStory = data.find((story) => story.name === selectedStoryName);
+        // Find the specific story by name
+        const selectedStory = data.find(
+          (story) => story.name === selectedStoryName
+        );
 
-      if (selectedStory) {
-        // Transform the data to match your existing structure
-        const transformedData = {
-          story: {
-            bgMusic: selectedStory.bgMusic,
-          },
-          scenes: selectedStory.scenes.map((scene) => ({
-            ...scene,
-            // Transform dialogues to match expected structure
-            dialogues: scene.dialogues ? scene.dialogues.map(d => d.text) : [],
-            dialogueSounds: scene.dialogues ? scene.dialogues.map(d => d.sound) : [],
-            dialogueTimestamps: scene.dialogues ? scene.dialogues.map(d => d.timestamps || []) : [],
-            // Ensure questions have the correct structure
-            questions: scene.questions ? scene.questions.map((question) => ({
-              ...question,
-              choices: question.choices || [],
-            })) : [],
-          })),
-        };
-
-        setStoryData(transformedData);
-        setStatus("succeeded");
-      } else {
-        throw new Error(`Story "${selectedStoryName}" not found`);
+        if (selectedStory) {
+          // Transform the data to match your existing structure
+          const transformedData = {
+            story: {
+              bgMusic: selectedStory.bgMusic,
+            },
+            scenes: selectedStory.scenes.map((scene) => ({
+              ...scene,
+              // Transform dialogues to match expected structure
+              dialogues: scene.dialogues
+                ? scene.dialogues.map((d) => d.text)
+                : [],
+              dialogueSounds: scene.dialogues
+                ? scene.dialogues.map((d) => d.sound)
+                : [],
+              dialogueTimestamps: scene.dialogues
+                ? scene.dialogues.map((d) => d.timestamps || [])
+                : [],
+              // Ensure questions have the correct structure
+              questions: scene.questions
+                ? scene.questions
+                    .map((question) => ({
+                      ...question,
+                      choices: question.choices || [],
+                    }))
+                    // SORT QUESTIONS BY qid (story1_q1 → story1_q2 → …)
+                    .sort((a, b) => {
+                      const getNumber = (qid) => parseInt(qid.split("_q")[1]);
+                      return getNumber(a.qid) - getNumber(b.qid);
+                    })
+                : [],
+            })),
+          };
+          localStorage.setItem("currentStory", selectedStoryName);
+          setStoryData(transformedData);
+          setStatus("succeeded");
+        } else {
+          throw new Error(`Story "${selectedStoryName}" not found`);
+        }
+      } catch (error) {
+        console.error("Fetch failed:", error);
+        setStatus("failed");
+        showNotification(`Failed to load story: ${selectedStoryName}`, "error");
       }
-    } catch (error) {
-      console.error("Fetch failed:", error);
-      setStatus("failed");
-      showNotification(`Failed to load story: ${selectedStoryName}`, "error");
     }
-  }
 
-  fetchNotionData();
-  
-}, [selectedStoryName]);
+    fetchNotionData();
+  }, [selectedStoryName]);
 
   // Initialize background music
   useEffect(() => {
@@ -181,21 +206,22 @@ useEffect(() => {
         });
       });
     }
-    
   }, [storyData]);
 
   useEffect(() => {
-  if (!storyData?.scenes) return;
+    if (!storyData?.scenes) return;
 
-  const nextScenes = storyData.scenes.slice(currentSceneIndex + 1, currentSceneIndex + 3);
-  nextScenes.forEach((scene) => {
-    if (scene.pictures) {
-      const img = new Image();
-      img.src = scene.pictures; // browser caches it
-    }
-  });
-}, [currentSceneIndex, storyData]);
-
+    const nextScenes = storyData.scenes.slice(
+      currentSceneIndex + 1,
+      currentSceneIndex + 3
+    );
+    nextScenes.forEach((scene) => {
+      if (scene.pictures) {
+        const img = new Image();
+        img.src = scene.pictures; // browser caches it
+      }
+    });
+  }, [currentSceneIndex, storyData]);
 
   // Auto-scroll to bottom when content changes
   const scrollToBottom = () => {
@@ -321,7 +347,7 @@ useEffect(() => {
   };
 
   if (!started) {
-    return <StartScreen onStart={handleStart} storyName={selectedStoryName}/>;
+    return <StartScreen onStart={handleStart} storyName={selectedStoryName} />;
   }
 
   return (
@@ -411,6 +437,7 @@ useEffect(() => {
                     currentScene.questions[currentQuestionState.index]
                       .questionText
                   }
+                  questionNumber={getCumulativeQuestionNumber()}
                   choices={
                     currentScene.questions[currentQuestionState.index].choices
                   }

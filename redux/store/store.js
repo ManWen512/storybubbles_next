@@ -4,13 +4,17 @@ import testReducer from "@/redux/slices/testSlice";
 import storyReducer from "@/redux/slices/storySlice";
 import helloReducer from "@/redux/slices/helloSlice";
 import storyAnswerReducer from '@/redux/slices/storyAnswerSlice';
+import questionReducer from '@/redux/slices/questionSlice';
+
 
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
-    test: testReducer,
+    tests: testReducer,
     story: storyReducer,
     hello: helloReducer,
-    storyAnswer: storyAnswerReducer,
+    answers: storyAnswerReducer,
+    questions: questionReducer,
+ 
   },
 });

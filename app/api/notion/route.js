@@ -71,6 +71,7 @@ export async function GET() {
 
     const questions = questionsRes.results.map((page) => ({
       id: page.id,
+      qid: page.properties.qid.rich_text[0]?.plain_text,
       sceneId: page.properties.Scenes.relation[0]?.id,
       questionText: page.properties.questionText.title[0]?.plain_text,
       correctAnswerIndex: page.properties.correctAnswerIndex.number,

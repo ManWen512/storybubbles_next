@@ -16,7 +16,7 @@ export const fetchStory = createAsyncThunk(
 // redux/slices/storySlice.js
 export const submitStoryAnswer = createAsyncThunk(
   'story/submitAnswer',
-  async ({ username, storyName, question, chosenAnswer, isCorrect, correctAnswer }) => {
+  async ({ username, storyName, questionNumber, answer }) => {
     const response = await fetch('/api/save-answer', {
       method: 'POST',
       headers: {
@@ -25,10 +25,8 @@ export const submitStoryAnswer = createAsyncThunk(
       body: JSON.stringify({
         username,
         storyName,
-        question,
-        chosenAnswer,
-        isCorrect, 
-        correctAnswer,
+        questionNumber,
+        answer
       }),
     });
 
