@@ -77,8 +77,6 @@ export default function QuestionTask({
       incorrectSoundRef.current = null;
     };
   }, []);
-  
-
 
   const handleSubmit = async () => {
     if (selectedAnswer !== null && !answered && !isSubmitting) {
@@ -95,22 +93,9 @@ export default function QuestionTask({
         const isCorrect = selectedAnswer === correctAnswerIndex;
 
         // Get the actual chosen answer text
-        const chosenAnswerText = `${choices[selectedAnswer]?.label},${isCorrect.toString()}` || `Option ${selectedAnswer + 1}`;
-
-        // Dispatch the Redux action to save answer with corrected data structure
-        await dispatch(
-          submitStoryAnswer({
-            username,
-            storyName: storyName,
-            questionNumber: questionNumber,
-            // chosenAnswer should be a boolean for checkbox field, not the text
-            answer: chosenAnswerText,
-           
-          })
-        ).unwrap();
-
-        // Add a small delay to show loading state (optional)
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const chosenAnswerText =
+          `${choices[selectedAnswer]?.label},${isCorrect.toString()}` ||
+          `Option ${selectedAnswer + 1}`;
 
         // Play appropriate sound based on answer
         if (isCorrect) {
@@ -118,9 +103,23 @@ export default function QuestionTask({
         } else {
           incorrectSoundRef.current?.play();
         }
-
         // Call the original onAnswer callback
         onAnswer(isCorrect);
+
+        // Dispatch the Redux action to save answer with corrected data structure
+        // Save to backend in background (don't await)
+        dispatch(
+          submitStoryAnswer({
+            username,
+            storyName: storyName,
+            questionNumber: questionNumber,
+            answer: chosenAnswerText,
+          })
+        ).catch((error) => {
+          console.error("Failed to submit answer:", error);
+          // Could show a toast notification instead of alert
+          // toast.error("Failed to save progress");
+        });
       } catch (error) {
         console.error("Failed to submit answer:", error);
         alert("Failed to save your answer. Please try again.");
@@ -163,7 +162,9 @@ export default function QuestionTask({
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + index * 0.1 }}
-                  onClick={() => !answered && !isSubmitting && setSelectedAnswer(index)}
+                  onClick={() =>
+                    !answered && !isSubmitting && setSelectedAnswer(index)
+                  }
                   className={`justify-center items-center flex font-bold font-quicksand px-3 py-5 border-2 rounded-2xl transition-colors hover:border-purple-400 
                     ${
                       selectedAnswer === index
@@ -182,7 +183,11 @@ export default function QuestionTask({
                         ? "bg-red-100 border-red-400"
                         : ""
                     }
-                    ${answered || isSubmitting ? "cursor-default opacity-75" : "cursor-pointer"}
+                    ${
+                      answered || isSubmitting
+                        ? "cursor-default opacity-75"
+                        : "cursor-pointer"
+                    }
                   `}
                 >
                   {choice?.label || `Option ${index + 1}`}

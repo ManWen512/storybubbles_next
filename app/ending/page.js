@@ -131,8 +131,8 @@ export default function EndingPage() {
       case "The Kingdom of Lost Words":
         router.push("/story3");
         break;
-      case "The Ocean of Stolen Stories": // assuming this is story3's name
-        router.push("/");
+      case "The Ocean of Stolen Stories": 
+        router.push("/postTest");
         break;
       default:
         router.push("/");

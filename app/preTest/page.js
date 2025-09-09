@@ -14,9 +14,12 @@ export default function PreTest() {
   const dispatch = useDispatch();
   const { tests, status, loading } = useSelector((state) => state.tests);
 
-
   const [answers, setAnswers] = useState({});
-  const [notif, setNotif] = useState({ show: false, message: "", type: "success" });
+  const [notif, setNotif] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   // ✅ Notification
   const showNotification = (message, type = "success") => {
@@ -25,11 +28,26 @@ export default function PreTest() {
 
   // ✅ Likert emojis
   const likertChoices = [
-    { emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f61e/512.gif" },
-    { emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f615/512.gif" },
-    { emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f610/512.gif" },
-    { emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f604/512.gif" },
-    { emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f929/512.gif" },
+    {
+      emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f61e/512.gif",
+      title: "Very Unhappy",
+    },
+    {
+      emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f615/512.gif",
+      title: "Unhappy",
+    },
+    {
+      emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f610/512.gif",
+      title: "Neutral",
+    },
+    {
+      emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f604/512.gif",
+      title: "Happy",
+    },
+    {
+      emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f929/512.gif",
+      title: "Very Happy",
+    },
   ];
 
   // ✅ Fetch test questions
@@ -62,6 +80,10 @@ export default function PreTest() {
         answers[idx] !== undefined ? answers[idx] : 0;
     });
 
+    // Show success immediately and navigate
+    showNotification("Successfully Submitted", "success");
+    router.push("/story1");
+
     // Dispatch API call
     dispatch(
       submitTestAnswers({
@@ -69,13 +91,11 @@ export default function PreTest() {
         type: "preTest",
         answers: finalAnswers,
       })
-    )
-      .unwrap()
-      .then(() => {
-        showNotification("Successfully Submitted", "success");
-         router.push("/story1")
-      })
-      .catch(() => showNotification("Submission Failed", "error"));
+    ).catch((error) => {
+      console.error("Background save failed:", error);
+      // Could show a discrete notification or retry logic
+      // showNotification("Sync failed - will retry", "warning");
+    });
   };
 
   return (
@@ -124,8 +144,9 @@ export default function PreTest() {
                       alt={`choice-${index}`}
                       width="48"
                       height="48"
-                      className="pointer-events-none"
+                      className="pointer-events-none mb-2"
                     />
+                    <span>{choice.title}</span>
                   </label>
                 ))}
               </div>
@@ -138,7 +159,11 @@ export default function PreTest() {
               disabled={loading}
               className="w-18 h-18 cursor-pointer bg-purple-400 text-white px-6 py-2 rounded-full shadow-2xl hover:bg-purple-500 transition duration-200"
             >
-              {loading ? "Submitting..." : <PiArrowFatLinesRightFill size={25} />}
+              {loading ? (
+                "Submitting..."
+              ) : (
+                <PiArrowFatLinesRightFill size={25} />
+              )}
             </SoundButton>
           </div>
         </form>
