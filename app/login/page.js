@@ -70,7 +70,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="p-4 h-screen w-screen bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50">
+    <div className="p-4 h-auto sm:h-screen w-screen bg-gradient-to-br from-emerald-50 via-emerald-200 to-emerald-50">
       <Notification
         show={notif.show}
         message={notif.message}

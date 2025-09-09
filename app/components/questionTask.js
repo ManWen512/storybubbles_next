@@ -275,26 +275,29 @@ export default function QuestionTask({
                       damping: 20,
                       delay: 0.2,
                     }}
-                    className="text-red-600 flex items-center justify-center gap-2"
+                    className="text-red-600 flex items-center justify-center gap-2 flex-col"
                   >
-                    <motion.span
-                      initial={{ rotate: 180, scale: 0 }}
-                      animate={{ rotate: 0, scale: 1 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 260,
-                        damping: 20,
-                        delay: 0.3,
-                      }}
-                    >
-                      ✗
-                    </motion.span>
-                    Incorrect!{" "}
+                    <div>
+                      <motion.span
+                        initial={{ rotate: 180, scale: 0 }}
+                        animate={{ rotate: 0, scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 260,
+                          damping: 20,
+                          delay: 0.3,
+                        }}
+                      >
+                        ✗
+                      </motion.span>
+                      Incorrect!
+                    </div>
                     {correctAnswerLabel && (
                       <motion.span
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.5 }}
+                       
                       >
                         The correct answer is: {correctAnswerLabel}
                       </motion.span>

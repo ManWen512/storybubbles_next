@@ -126,27 +126,26 @@ export default function PreTest() {
               <h2 className="text-lg font-quicksand mb-2">
                 {questionIndex + 1}. {q.name}
               </h2>
-              <div className="grid grid-cols-5 gap-1 place-items-center">
+              <div className="grid grid-cols-5 gap-2 place-items-center">
                 {likertChoices.map((choice, index) => (
                   <label
                     key={index}
-                    className={`cursor-pointer flex flex-col items-center gap-1 rounded-xl p-2 transition
+                    className={`cursor-pointer flex flex-col items-center gap-1 rounded-xl sm:p-2 p-1 transition 
                       ${
                         answers[questionIndex] === index
                           ? "bg-purple-200 border-purple-400 border-2"
                           : "border border-gray-300"
                       }
-                      hover:bg-purple-100`}
+                      hover:bg-purple-100 `}
                     onClick={() => handleChange(questionIndex, index)}
                   >
                     <img
                       src={choice.emoji}
                       alt={`choice-${index}`}
-                      width="48"
-                      height="48"
-                      className="pointer-events-none mb-2"
+                      
+                      className="pointer-events-none mb-2 w-8 h-8 sm:w-12 sm:h-12 "
                     />
-                    <span>{choice.title}</span>
+                    <span className="text-center text-sm">{choice.title}</span>
                   </label>
                 ))}
               </div>
