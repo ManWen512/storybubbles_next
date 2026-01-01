@@ -8,12 +8,13 @@ import { useRouter } from "next/navigation";
 import Notification from "../components/notification";
 import LoadingScreen from "../components/loadingScreen";
 import SoundButton from "../components/soundButton";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function PreTest() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { tests, status, loading } = useSelector((state) => state.tests);
-
+  const [language, setLanguage] = useState("english");
   const [answers, setAnswers] = useState({});
   const [notif, setNotif] = useState({
     show: false,
@@ -30,11 +31,11 @@ export default function PreTest() {
   const likertChoices = [
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f61e/512.gif",
-      title: "Very Unhappy",
+      title: "Strongly Disagree",
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f615/512.gif",
-      title: "Unhappy",
+      title: "Disagree",
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f610/512.gif",
@@ -42,11 +43,11 @@ export default function PreTest() {
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f604/512.gif",
-      title: "Happy",
+      title: "Agree",
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f929/512.gif",
-      title: "Very Happy",
+      title: "Strongly Agree",
     },
   ];
 
@@ -54,6 +55,13 @@ export default function PreTest() {
   useEffect(() => {
     dispatch(fetchTests());
   }, [dispatch]);
+
+   // ✅ Handle language toggle
+  const handleLanguageChange = (value) => {
+    if (value) {
+      setLanguage(value);
+    }
+  };
 
   // ✅ Handle choice selection
   const handleChange = (questionIndex, index) => {
@@ -107,9 +115,24 @@ export default function PreTest() {
           type={notif.type}
           onClose={() => setNotif({ ...notif, show: false })}
         />
-        <h1 className="text-2xl font-quicksand font-bold mb-6">
-          Game Feedback Form
-        </h1>
+        <div className="flex flex-row justify-between items-center mb-6">
+          <h1 className="text-2xl font-quicksand font-bold mb-6">Pre-Test</h1>
+          <ToggleGroup
+            variant="outline"
+            type="single"
+            className="mb-4  "
+            defaultValue="english"
+            value={language}
+            onValueChange={handleLanguageChange}
+          >
+            <ToggleGroupItem value="english" aria-label="Toggle english">
+              English
+            </ToggleGroupItem>
+            <ToggleGroupItem value="myanmar" aria-label="Toggle myanmar">
+              မြန်မာ
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
         {status === "loading" && (
           <div className="flex items-center justify-center">
@@ -123,8 +146,8 @@ export default function PreTest() {
         <form onSubmit={handleSubmit}>
           {tests.map((q, questionIndex) => (
             <div key={questionIndex} className="mb-6">
-              <h2 className="text-lg font-quicksand mb-2">
-                {questionIndex + 1}. {q.name}
+              <h2 className={`${language === "myanmar" ? "text-lg font-myanmar " : "text-lg font-quicksand"} mb-3`}>
+                {questionIndex + 1}. {language === "english" ? q.name : q.mmtranslate}
               </h2>
               <div className="grid grid-cols-5 gap-2 place-items-center">
                 {likertChoices.map((choice, index) => (
@@ -142,7 +165,6 @@ export default function PreTest() {
                     <img
                       src={choice.emoji}
                       alt={`choice-${index}`}
-                      
                       className="pointer-events-none mb-2 w-8 h-8 sm:w-12 sm:h-12 "
                     />
                     <span className="text-center text-sm">{choice.title}</span>

@@ -16,24 +16,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if username already exists
-    const existingUser = await notion.databases.query({
-      database_id: process.env.NOTION_USERS_DATABASE_ID,
-      filter: {
-        property: "username",
-        rich_text: {
-          equals: username
-        }
-      }
-    });
-
-    if (existingUser.results.length > 0) {
-      return Response.json(
-        { error: 'Username already exists. Please choose a different username.' },
-        { status: 409 }
-      );
-    }
-
     // Generate unique user ID
     const userId = `user_${uuidv4().replace(/-/g, '').substring(0, 12)}`;
 

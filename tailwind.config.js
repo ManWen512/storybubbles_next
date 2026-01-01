@@ -12,7 +12,11 @@ module.exports = {
   			quicksand: [
   				'Quicksand',
   				'sans-serif'
-  			]
+  			],
+			myanmar: [
+				'MyanmarFont',
+				'sans-serif'
+			]
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

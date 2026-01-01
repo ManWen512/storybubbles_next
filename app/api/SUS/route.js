@@ -6,16 +6,16 @@ const notion = new Client({
   auth: process.env.NOTION_INTERNAL_INTEGRATION_SECRET,
 });
 
-const testDB = process.env.NOTION_TEST_DB_ID;
+const SUSDB = process.env.NOTION_SUS_DB_ID;
 
 export async function GET() {
   try {
-    const testRes = await notion.databases.query({ database_id: testDB });
+    const testRes = await notion.databases.query({ database_id: SUSDB });
 
     const tests = testRes.results.map((page) => ({
       id: page.id,
       name: page.properties.Name.title[0]?.plain_text,
-      mmtranslate: page.properties.mmtranslate.rich_text[0]?.plain_text || "",
+      mmtranslate: page.properties.mmTranslate.rich_text[0]?.plain_text || "",
      
     }));
 

@@ -18,6 +18,22 @@ export const fetchTests = createAsyncThunk(
   }
 );
 
+export const fetchSUS = createAsyncThunk(
+  "tests/fetchSUS",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch("/api/SUS");
+      if (!res.ok) {
+        throw new Error("Failed to fetch SUStests");
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const submitTestAnswers = createAsyncThunk(
   "tests/submit",
   async ({ username, type, answers }, { rejectWithValue }) => {
@@ -66,6 +82,18 @@ const testSlice = createSlice({
         state.tests = action.payload;
       })
       .addCase(fetchTests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
+      })
+      .addCase(fetchSUS.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSUS.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tests = action.payload;
+      })
+      .addCase(fetchSUS.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       })

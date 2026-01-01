@@ -220,7 +220,7 @@ export default function EndingPage() {
           {totalQuestions > 0 && (
             <SoundButton
               onClick={() => setShowAnswers(true)}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg"
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg mb-2"
             >
               📋 View Answers
             </SoundButton>

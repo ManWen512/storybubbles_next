@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import { PiArrowFatLinesRightFill } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTests, submitTestAnswers } from "@/redux/slices/testSlice";
+import { fetchSUS, submitTestAnswers } from "@/redux/slices/testSlice";
 import { useRouter } from "next/navigation";
 import Notification from "../components/notification";
 import LoadingScreen from "../components/loadingScreen";
 import SoundButton from "../components/soundButton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export default function PostTest() {
+export default function SUSTest() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { tests, status, loading } = useSelector((state) => state.tests);
@@ -31,11 +31,11 @@ export default function PostTest() {
   const likertChoices = [
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f61e/512.gif",
-      title: "Very Unhappy",
+      title: "Strongly Disagree",
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f615/512.gif",
-      title: "Unhappy",
+      title: "Disagree",
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f610/512.gif",
@@ -43,18 +43,20 @@ export default function PostTest() {
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f604/512.gif",
-      title: "Happy",
+      title: "Agree",
     },
     {
       emoji: "https://fonts.gstatic.com/s/e/notoemoji/latest/1f929/512.gif",
-      title: "Very Happy",
+      title: "Strongly Agree",
     },
   ];
 
   // ✅ Fetch test questions
   useEffect(() => {
-    dispatch(fetchTests());
+    dispatch(fetchSUS());
   }, [dispatch]);
+
+  console.log("SUS Tests:", tests);
 
    // ✅ Handle language toggle
   const handleLanguageChange = (value) => {
@@ -90,13 +92,13 @@ export default function PostTest() {
 
     // Show success immediately and navigate
     showNotification("Successfully Submitted", "success");
-    router.push("/story1");
+    router.push("/");
 
     // Dispatch API call
     dispatch(
       submitTestAnswers({
         username: username,
-        type: "postTest",
+        type: "SUSTest",
         answers: finalAnswers,
       })
     ).catch((error) => {
@@ -116,7 +118,7 @@ export default function PostTest() {
           onClose={() => setNotif({ ...notif, show: false })}
         />
         <div className="flex flex-row justify-between items-center mb-6">
-          <h1 className="text-2xl font-quicksand font-bold mb-6">Post-Test</h1>
+          <h1 className="text-2xl font-quicksand font-bold mb-6">SUS Test</h1>
           <ToggleGroup
             variant="outline"
             type="single"
